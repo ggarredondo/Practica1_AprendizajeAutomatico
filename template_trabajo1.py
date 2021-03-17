@@ -23,27 +23,38 @@ def dEu(u,v):
 def dEv(u,v):
     return 2*(u**3*np.exp(v-2)-2*v**2*np.exp(-u))*(u**3*np.exp(v-2)-4*v*np.exp(-u))
 
-#Gradiente de E
+#Gradiente de E (Ejercicio 1.2.a)
 def gradE(u,v):
     return np.array([dEu(u,v), dEv(u,v)])
 
-def gradient_descent(initial_point, eta, error2get, maxIter):
+# Ejercicio 1.1 - Implementar el algoritmo de gradiente descendente
+def gradient_descent(initial_point, eta, error2get, maxIter, E, gradE):
     iterations = 0
     w = initial_point
-    while not E(w[0], w[1]) < error2get and iterations < maxIter:
+    error = E(w[0], w[1])
+    descenso_p = [w]
+    descenso_E = [error]
+    while not error < error2get and iterations < maxIter:
         w = w - eta*gradE(w[0], w[1])
+        error = E(w[0], w[1])
+        descenso_p.append(w)
+        descenso_E.append(error)
         iterations += 1
-    return w, iterations    
+    return w, iterations, descenso_p, descenso_E    
 
 
+# Ejercicio 1.2
 eta = 0.1 
 maxIter = 10000000000
 error2get = 1e-14
 initial_point = np.array([1.0,1.0])
-w, it = gradient_descent(initial_point, eta, error2get, maxIter)
+w, it, descenso_p, descenso_E = gradient_descent(initial_point, eta, error2get, maxIter, E, gradE)
 
-
-print ('Numero de iteraciones: ', it)
+# 1.2.b - ¿Cuántas iteraciones tarda el algoritmo en obtener por primera vez un
+# valor de E(u,v) inferior a 10^-14?
+print ('Número de iteraciones: ', it)
+# 1.2.c - ¿En qué coordenadas (u,v) se alcanzó por primera vez un valor igual o
+# menor a 10^-14 en el apartado anterior?
 print ('Coordenadas obtenidas: (', w[0], ', ', w[1],')')
 
 
@@ -68,11 +79,30 @@ plt.show()
 
 input("\n--- Pulsar tecla para continuar ---\n")
 
-#Seguir haciendo el ejercicio...
+# Ejercicio 1.3
+
+def F(x, y):
+    return (x+2)**2 + 2*(y-2)**2 + 2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y) 
+
+def dFx(x, y):
+    return 2*(x+2) + 4*np.pi*np.cos(2*np.pi*x)*np.sin(2*np.pi*y)
+
+def dFy(x, y):
+    return 4*(y-2) + 4*np.pi*np.sin(2*np.pi*x)*np.cos(2*np.pi*y)
+
+def gradF(x, y):
+    return np.array([dFx(x, y), dFy(x, y)])
+
+# 1.3.a - Minimizar la función para (x0 = -1, y0 = 1), eta = 0.01 y 50 iteraciones
+# como máximo
+eta = 0.01
+maxIter = 50
+initial_point = np.array([-1.0, 1.0])
+w, it, descenso_p, descenso_E = gradient_descent(initial_point, eta, error2get, maxIter, F, gradF)
 
 
-
-
+print ('Numero de iteraciones: ', it)
+print ('Coordenadas obtenidas: (', w[0], ', ', w[1],')')
 
 
 
