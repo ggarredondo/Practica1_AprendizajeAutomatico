@@ -32,15 +32,15 @@ def gradient_descent(initial_point, eta, error2get, maxIter, E, gradE):
     iterations = 0
     w = initial_point
     error = E(w[0], w[1])
-    descenso_p = [w]
-    descenso_E = [error]
+    coord = np.append(w, error)
+    descenso = np.array([coord])
     while not error < error2get and iterations < maxIter:
         w = w - eta*gradE(w[0], w[1])
         error = E(w[0], w[1])
-        descenso_p.append(w)
-        descenso_E.append(error)
+        coord = np.append(w, error)
+        descenso = np.row_stack((descenso, coord))
         iterations += 1
-    return w, iterations, descenso_p, descenso_E    
+    return w, iterations, descenso 
 
 
 # Ejercicio 1.2
@@ -48,20 +48,19 @@ eta = 0.1
 maxIter = 10000000000
 error2get = 1e-14
 initial_point = np.array([1.0,1.0])
-w, it, descenso_p, descenso_E = gradient_descent(initial_point, eta, error2get, maxIter, E, gradE)
+w, it, descenso = gradient_descent(initial_point, eta, error2get, maxIter, E, gradE)
 
 # 1.2.b - ¿Cuántas iteraciones tarda el algoritmo en obtener por primera vez un
 # valor de E(u,v) inferior a 10^-14?
 print ('Número de iteraciones: ', it)
 # 1.2.c - ¿En qué coordenadas (u,v) se alcanzó por primera vez un valor igual o
 # menor a 10^-14 en el apartado anterior?
-print ('Coordenadas obtenidas: (', w[0], ', ', w[1],')')
-
+print ('Coordenadas obtenidas: (', w[0], ', ', w[1], ',', E(w[0], w[1]) , ')')
 
 # DISPLAY FIGURE
 from mpl_toolkits.mplot3d import Axes3D
-x = np.linspace(-30, 30, 50)
-y = np.linspace(-30, 30, 50)
+x = np.linspace(1.0, 1.16, 50)
+y = np.linspace(1.0, 1.16, 50)
 X, Y = np.meshgrid(x, y)
 Z = E(X, Y) #E_w([X, Y])
 fig = plt.figure()
@@ -71,6 +70,7 @@ surf = ax.plot_surface(X, Y, Z, edgecolor='none', rstride=1,
 min_point = np.array([w[0],w[1]])
 min_point_ = min_point[:, np.newaxis]
 ax.plot(min_point_[0], min_point_[1], E(min_point_[0], min_point_[1]), 'r*', markersize=10)
+ax.plot(descenso[:,0], descenso[:,1], descenso[:,2], 'r', markersize=10)
 ax.set(title='Ejercicio 1.2. Función sobre la que se calcula el descenso de gradiente')
 ax.set_xlabel('u')
 ax.set_ylabel('v')
@@ -102,7 +102,7 @@ w, it, descenso_p, descenso_E = gradient_descent(initial_point, eta, error2get, 
 
 
 print ('Numero de iteraciones: ', it)
-print ('Coordenadas obtenidas: (', w[0], ', ', w[1],')')
+print ('Coordenadas obtenidas: (', w[0], ', ', w[1], ',', E(w[0], w[1]) , ')')
 
 
 
