@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 np.random.seed(1)
 
 print('EJERCICIO SOBRE LA BUSQUEDA ITERATIVA DE OPTIMOS\n')
-print('Ejercicio 1\n')
+print('-Ejercicio 1-\n')
 
 def E(u,v):
     return (u**3*np.exp(v-2)-2*v**2*np.exp(-u))**2   
@@ -32,14 +32,12 @@ def gradient_descent(initial_point, eta, error2get, maxIter, E, gradE):
     iterations = 0
     w = initial_point
     error = E(w[0], w[1])
-    coord = np.append(w, error)
-    descenso = np.array([coord])
-    while not error < error2get and iterations < maxIter:
+    descenso = np.array([iterations, error])
+    while not abs(error) < error2get and iterations < maxIter:
         w = w - eta*gradE(w[0], w[1])
         error = E(w[0], w[1])
-        coord = np.append(w, error)
-        descenso = np.row_stack((descenso, coord))
         iterations += 1
+        descenso = np.row_stack((descenso, np.array([iterations, error])))
     return w, iterations, descenso 
 
 
@@ -52,15 +50,15 @@ w, it, descenso = gradient_descent(initial_point, eta, error2get, maxIter, E, gr
 
 # 1.2.b - ¿Cuántas iteraciones tarda el algoritmo en obtener por primera vez un
 # valor de E(u,v) inferior a 10^-14?
-print ('Número de iteraciones: ', it)
+print ('-1.2-\nNúmero de iteraciones: ', it)
 # 1.2.c - ¿En qué coordenadas (u,v) se alcanzó por primera vez un valor igual o
 # menor a 10^-14 en el apartado anterior?
-print ('Coordenadas obtenidas: (', w[0], ', ', w[1], ',', E(w[0], w[1]) , ')')
+print ('Coordenadas obtenidas: (', w[0], ', ', w[1], ')')
 
 # DISPLAY FIGURE
 from mpl_toolkits.mplot3d import Axes3D
-x = np.linspace(1.0, 1.16, 50)
-y = np.linspace(1.0, 1.16, 50)
+x = np.linspace(-2, 2, 50)
+y = np.linspace(-2, 2, 50)
 X, Y = np.meshgrid(x, y)
 Z = E(X, Y) #E_w([X, Y])
 fig = plt.figure()
@@ -70,7 +68,6 @@ surf = ax.plot_surface(X, Y, Z, edgecolor='none', rstride=1,
 min_point = np.array([w[0],w[1]])
 min_point_ = min_point[:, np.newaxis]
 ax.plot(min_point_[0], min_point_[1], E(min_point_[0], min_point_[1]), 'r*', markersize=10)
-ax.plot(descenso[:,0], descenso[:,1], descenso[:,2], 'r', markersize=10)
 ax.set(title='Ejercicio 1.2. Función sobre la que se calcula el descenso de gradiente')
 ax.set_xlabel('u')
 ax.set_ylabel('v')
@@ -95,15 +92,25 @@ def gradF(x, y):
 
 # 1.3.a - Minimizar la función para (x0 = -1, y0 = 1), eta = 0.01 y 50 iteraciones
 # como máximo
-eta = 0.01
 maxIter = 50
 initial_point = np.array([-1.0, 1.0])
-w, it, descenso_p, descenso_E = gradient_descent(initial_point, eta, error2get, maxIter, F, gradF)
+w1, it1, descenso1 = gradient_descent(initial_point, 0.01, error2get, maxIter, F, gradF)
+w2, it2, descenso2 = gradient_descent(initial_point, 0.1, error2get, maxIter, F, gradF)
 
+print("-1.3.a-\n")
+print ("Para eta = 0.01\nNumero de iteraciones: ", it1)
+print ("Coordenadas obtenidas: (", w1[0], ", ", w1[1], ")")
 
-print ('Numero de iteraciones: ', it)
-print ('Coordenadas obtenidas: (', w[0], ', ', w[1], ',', E(w[0], w[1]) , ')')
+print ("\nPara eta = 0.1\nNumero de iteraciones: ", it2)
+print ("Coordenadas obtenidas: (", w2[0], ", ", w2[1], ")")
 
+plt.plot(descenso1[:,0], descenso1[:,1])
+plt.plot(descenso2[:,0], descenso2[:,1], "r")
+plt.title("Ejercicio 1.3.a. Gradiente descendente de F(x,y)")
+plt.xlabel("Iteraciones")
+plt.ylabel("F(x,y)")
+plt.legend(("eta = 0.01", "eta = 0.1"))
+plt.show()
 
 
 ###############################################################################
