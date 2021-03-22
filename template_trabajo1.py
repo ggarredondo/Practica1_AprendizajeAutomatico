@@ -113,7 +113,7 @@ plt.legend(("eta = 0.01", "eta = 0.1"))
 plt.show()
 
 input("\n--- Pulsar tecla para continuar al ejercicio 1.3.b ---\n")
-a, it, des = gradient_descent(np.array([-0.5, 0.5],dtype=np.float64), eta, error2get, maxIter, F, gradF)
+a, it, des = gradient_descent(np.array([-0.5, -0.5],dtype=np.float64), eta, error2get, maxIter, F, gradF)
 b, it, des = gradient_descent(np.array([1.0, 1.0],dtype=np.float64), eta, error2get, maxIter, F, gradF)
 c, it, des = gradient_descent(np.array([2.1, -2.1],dtype=np.float64), eta, error2get, maxIter, F, gradF)
 d, it, des = gradient_descent(np.array([-3.0, 3.0],dtype=np.float64), eta, error2get, maxIter, F, gradF)
@@ -126,12 +126,11 @@ fig, ax = plt.subplots()
 ax.axis("off")
 table = ax.table(cellText=valores, 
           colLabels=["x","y","F(x,y)"],
-          rowLabels=["(-0.5,0.5)",
+          rowLabels=["(-0.5,-0.5)",
                      "(1,1)",
                      "(2.1,-2.1)",
                      "(-3,3)",
                      "(-2,2)"],
-          fontsize=12,
           loc="center")
 
 plt.title("Ejercicio 1.3.b. Para eta = " +str(eta)+ " y un máximo de " +str(maxIter)+ " iteraciones")
