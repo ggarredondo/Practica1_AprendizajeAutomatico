@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 
 np.random.seed(1)
 
-print('EJERCICIO SOBRE LA BUSQUEDA ITERATIVA DE OPTIMOS\n')
-print('-Ejercicio 1-\n')
+print("EJERCICIO SOBRE LA BUSQUEDA ITERATIVA DE OPTIMOS\n")
+print("-Ejercicio 1-\n")
 
 def E(u,v):
     return (u**3*np.exp(v-2)-2*v**2*np.exp(-u))**2   
@@ -50,10 +50,10 @@ w, it, descenso = gradient_descent(initial_point, eta, error2get, maxIter, E, gr
 
 # 1.2.b - ¿Cuántas iteraciones tarda el algoritmo en obtener por primera vez un
 # valor de E(u,v) inferior a 10^-14?
-print ('-1.2-\nNúmero de iteraciones: ', it)
+print ("-1.2-\nNúmero de iteraciones: ", it)
 # 1.2.c - ¿En qué coordenadas (u,v) se alcanzó por primera vez un valor igual o
 # menor a 10^-14 en el apartado anterior?
-print ('Coordenadas obtenidas: (', w[0], ', ', w[1], ')')
+print ("Coordenadas obtenidas: (", w[0], ", ", w[1], ")")
 
 # DISPLAY FIGURE
 from mpl_toolkits.mplot3d import Axes3D
@@ -63,15 +63,15 @@ X, Y = np.meshgrid(x, y)
 Z = E(X, Y) #E_w([X, Y])
 fig = plt.figure()
 ax = Axes3D(fig)
-surf = ax.plot_surface(X, Y, Z, edgecolor='none', rstride=1,
-                        cstride=1, cmap='jet')
+surf = ax.plot_surface(X, Y, Z, edgecolor="none", rstride=1,
+                        cstride=1, cmap="jet")
 min_point = np.array([w[0],w[1]])
 min_point_ = min_point[:, np.newaxis]
-ax.plot(min_point_[0], min_point_[1], E(min_point_[0], min_point_[1]), 'r*', markersize=10)
-ax.set(title='Ejercicio 1.2. Función sobre la que se calcula el descenso de gradiente')
-ax.set_xlabel('u')
-ax.set_ylabel('v')
-ax.set_zlabel('E(u,v)')
+ax.plot(min_point_[0], min_point_[1], E(min_point_[0], min_point_[1]), "r*", markersize=10)
+ax.set(title="Ejercicio 1.2. Función sobre la que se calcula el descenso de gradiente")
+ax.set_xlabel("u")
+ax.set_ylabel("v")
+ax.set_zlabel("E(u,v)")
 plt.show()
 
 input("\n--- Pulsar tecla para continuar al ejercicio 1.3.a ---\n")
@@ -98,10 +98,10 @@ w1, it1, descenso1 = gradient_descent(initial_point, 0.01, error2get, maxIter, F
 w2, it2, descenso2 = gradient_descent(initial_point, 0.1, error2get, maxIter, F, gradF)
 
 print("-1.3.a-\n")
-print ("Para eta = 0.01\nNumero de iteraciones: ", it1)
+print ("Para eta = 0.01\nNúmero de iteraciones: ", it1)
 print ("Coordenadas obtenidas: (", w1[0], ", ", w1[1], ")")
 
-print ("\nPara eta = 0.1\nNumero de iteraciones: ", it2)
+print ("\nPara eta = 0.1\nNúmero de iteraciones: ", it2)
 print ("Coordenadas obtenidas: (", w2[0], ", ", w2[1], ")")
 
 plt.plot(descenso1[:,0], descenso1[:,1])
@@ -133,6 +133,8 @@ table = ax.table(cellText=valores,
                      "(-2,2)"],
           fontsize=12,
           loc="center")
+
+plt.title("Ejercicio 1.3.b. Para eta = " +str(eta)+ " y un máximo de " +str(maxIter)+ " iteraciones")
 table.scale(2.5,2.5)
 plt.show()
 
