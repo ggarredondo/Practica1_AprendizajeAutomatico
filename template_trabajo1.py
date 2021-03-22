@@ -32,7 +32,7 @@ def gradient_descent(initial_point, eta, error2get, maxIter, E, gradE):
     iterations = 0
     w = initial_point
     error = E(w[0], w[1])
-    descenso = np.array([iterations, error])
+    descenso = np.array([iterations, error],dtype=np.float64)
     while not abs(error) < error2get and iterations < maxIter:
         w = w - eta*gradE(w[0], w[1])
         error = E(w[0], w[1])
@@ -45,7 +45,7 @@ def gradient_descent(initial_point, eta, error2get, maxIter, E, gradE):
 eta = 0.1 
 maxIter = 10000000000
 error2get = 1e-14
-initial_point = np.array([1.0,1.0])
+initial_point = np.array([1.0,1.0],dtype=np.float64)
 w, it, descenso = gradient_descent(initial_point, eta, error2get, maxIter, E, gradE)
 
 # 1.2.b - ¿Cuántas iteraciones tarda el algoritmo en obtener por primera vez un
@@ -74,7 +74,7 @@ ax.set_ylabel('v')
 ax.set_zlabel('E(u,v)')
 plt.show()
 
-input("\n--- Pulsar tecla para continuar ---\n")
+input("\n--- Pulsar tecla para continuar al ejercicio 1.3.a ---\n")
 
 # Ejercicio 1.3
 
@@ -93,7 +93,7 @@ def gradF(x, y):
 # 1.3.a - Minimizar la función para (x0 = -1, y0 = 1), eta = 0.01 y 50 iteraciones
 # como máximo
 maxIter = 50
-initial_point = np.array([-1.0, 1.0])
+initial_point = np.array([-1.0, 1.0], dtype=np.float64)
 w1, it1, descenso1 = gradient_descent(initial_point, 0.01, error2get, maxIter, F, gradF)
 w2, it2, descenso2 = gradient_descent(initial_point, 0.1, error2get, maxIter, F, gradF)
 
@@ -112,6 +112,29 @@ plt.ylabel("F(x,y)")
 plt.legend(("eta = 0.01", "eta = 0.1"))
 plt.show()
 
+input("\n--- Pulsar tecla para continuar al ejercicio 1.3.b ---\n")
+a, it, des = gradient_descent(np.array([-0.5, 0.5],dtype=np.float64), eta, error2get, maxIter, F, gradF)
+b, it, des = gradient_descent(np.array([1.0, 1.0],dtype=np.float64), eta, error2get, maxIter, F, gradF)
+c, it, des = gradient_descent(np.array([2.1, -2.1],dtype=np.float64), eta, error2get, maxIter, F, gradF)
+d, it, des = gradient_descent(np.array([-3.0, 3.0],dtype=np.float64), eta, error2get, maxIter, F, gradF)
+e, it, des = gradient_descent(np.array([-2.0, 2.0],dtype=np.float64), eta, error2get, maxIter, F, gradF)
+valores = np.array([np.append(a, F(a[0], a[1])), np.append(b, F(b[0], b[1])),
+                    np.append(d, F(c[0], c[1])), np.append(d, F(d[0], d[1])),
+                    np.append(e, F(e[0], e[1]))])
+
+fig, ax = plt.subplots()
+ax.axis("off")
+table = ax.table(cellText=valores, 
+          colLabels=["x","y","F(x,y)"],
+          rowLabels=["(-0.5,0.5)",
+                     "(1,1)",
+                     "(2.1,-2.1)",
+                     "(-3,3)",
+                     "(-2,2)"],
+          fontsize=12,
+          loc="center")
+table.scale(2.5,2.5)
+plt.show()
 
 ###############################################################################
 ###############################################################################
