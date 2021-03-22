@@ -119,7 +119,7 @@ c, it, des = gradient_descent(np.array([2.1, -2.1],dtype=np.float64), eta, error
 d, it, des = gradient_descent(np.array([-3.0, 3.0],dtype=np.float64), eta, error2get, maxIter, F, gradF)
 e, it, des = gradient_descent(np.array([-2.0, 2.0],dtype=np.float64), eta, error2get, maxIter, F, gradF)
 valores = np.array([np.append(a, F(a[0], a[1])), np.append(b, F(b[0], b[1])),
-                    np.append(d, F(c[0], c[1])), np.append(d, F(d[0], d[1])),
+                    np.append(c, F(c[0], c[1])), np.append(d, F(d[0], d[1])),
                     np.append(e, F(e[0], e[1]))])
 
 fig, ax = plt.subplots()
