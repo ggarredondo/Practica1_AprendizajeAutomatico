@@ -7,9 +7,10 @@ Nombre Estudiante: Guillermo García Arredondo
 import numpy as np
 import matplotlib.pyplot as plt
 
-np.random.seed(1)
+seed = 1
+np.random.seed(seed)
 
-print("EJERCICIO SOBRE LA BUSQUEDA ITERATIVA DE OPTIMOS\n")
+print("EJERCICIO SOBRE LA BÚSQUEDA ITERATIVA DE ÓPTIMOS\n")
 print("-Ejercicio 1-\n")
 
 def E(u,v):
@@ -113,6 +114,7 @@ plt.legend(("eta = 0.01", "eta = 0.1"))
 plt.show()
 
 input("\n--- Pulsar tecla para continuar al ejercicio 1.3.b ---\n")
+eta = 0.01
 a, it, des = gradient_descent(np.array([-0.5, -0.5],dtype=np.float64), eta, error2get, maxIter, F, gradF)
 b, it, des = gradient_descent(np.array([1.0, 1.0],dtype=np.float64), eta, error2get, maxIter, F, gradF)
 c, it, des = gradient_descent(np.array([2.1, -2.1],dtype=np.float64), eta, error2get, maxIter, F, gradF)
@@ -141,13 +143,14 @@ plt.show()
 ###############################################################################
 ###############################################################################
 ###############################################################################
-print('EJERCICIO SOBRE REGRESION LINEAL\n')
-print('Ejercicio 1\n')
+print("EJERCICIO SOBRE REGRESIÓN LINEAL\n")
+print("-Ejercicio 2-\n")
+from sklearn.utils import shuffle
 
 label5 = 1
 label1 = -1
 
-# Funcion para leer los datos
+# Función para leer los datos
 def readData(file_x, file_y):
 	# Leemos los ficheros	
 	datax = np.load(file_x)
@@ -168,18 +171,36 @@ def readData(file_x, file_y):
 	
 	return x, y
 
-# Funcion para calcular el error
+# Función para calcular el error
 def Err(x,y,w):
-    return 
+    return ((w.T*x - y)**2).mean(axis=0)
 
-# Gradiente Descendente Estocastico
-def sgd(?):
-    #
+# Gradiente de la función de error
+def gradErr(x, y, w):
+    return (2*x*(w.T*x - y)).mean(axis=0)
+    
+# Gradiente Descendente Estocástico
+def sgd(initial_point, x, y, eta, error2get, maxIter, minibatch_size):
+    w = initial_point
+    iterations = 0
+    
+    minibatches_x = np.array_split(x, len(x)//minibatch_size)
+    minibatches_y = np.array_split(y, len(y)//minibatch_size)
+    minibatches_x, minibatches_y = shuffle(minibatches_x, minibatches_y, random_state=seed)
+    
+    for i in range(0, len(minibatches_x)):
+        error = abs(Err(minibatches_x[i], minibatches_y[i], w))
+        while not error < error2get and iterations < maxIter:
+            w = w - eta*gradErr(minibatches_x[i], minibatches_y[i], w)
+            error = abs(Err(minibatches_x[i], minibatches_y[i], w))
+            iterations += 1
+        if error < error2get:
+            break
     return w
 
 # Pseudoinversa	
-def pseudoinverse(?):
-    #
+def pseudoinverse(x, y):
+    w = np.linalg.pinv(x)*y
     return w
 
 
@@ -188,8 +209,8 @@ x, y = readData('datos/X_train.npy', 'datos/y_train.npy')
 # Lectura de los datos para el test
 x_test, y_test = readData('datos/X_test.npy', 'datos/y_test.npy')
 
-
-w = sgd(?)
+maxIter = 10000000000
+w = sgd(np.array([0.0 * len(x)], dtype=np.float64), x, y, eta, error2get, maxIter, 24)
 print ('Bondad del resultado para grad. descendente estocastico:\n')
 print ("Ein: ", Err(x,y,w))
 print ("Eout: ", Err(x_test, y_test, w))
@@ -198,7 +219,7 @@ input("\n--- Pulsar tecla para continuar ---\n")
 
 #Seguir haciendo el ejercicio...
 
-print('Ejercicio 2\n')
+print("Ejercicio 2\n")
 # Simula datos en un cuadrado [-size,size]x[-size,size]
 def simula_unif(N, d, size):
 	return np.random.uniform(-size,size,(N,d))
