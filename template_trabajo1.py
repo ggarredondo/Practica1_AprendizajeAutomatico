@@ -210,9 +210,10 @@ x, y = readData('datos/X_train.npy', 'datos/y_train.npy')
 x_test, y_test = readData('datos/X_test.npy', 'datos/y_test.npy')
 
 maxIter = 10000000000
-#print(x*np.array([0.0 * len(x[0])], dtype=np.float64))
-#print(len(x[0]))
-w = sgd(np.array([0.0 * len(x[0])], dtype=np.float64), x, y, eta, error2get, maxIter, 24)
+#print(x*np.array([0.0] * len(x.T), dtype=np.float64))
+#print(x)
+#print(np.array([0.0] * len(x.T), dtype=np.float64))
+#w = sgd(np.array([0.0] * len(x.T), dtype=np.float64), x, y, eta, error2get, maxIter, 24)
 print ('Bondad del resultado para grad. descendente estocastico:\n')
 print ("Ein: ", Err(x,y,w))
 print ("Eout: ", Err(x_test, y_test, w))
