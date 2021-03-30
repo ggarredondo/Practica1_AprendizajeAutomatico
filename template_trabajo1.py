@@ -177,30 +177,30 @@ def Err(x,y,w):
 
 # Gradiente de la función de error
 def gradErr(x, y, w):
-    return (2*(np.matmul(w,x.T) - y)).mean(axis=0)
+    return (2*np.matmul((np.matmul(w,x.T) - y), x)).mean(axis=0) #esto debería devolver un array de tres
     
 # Gradiente Descendente Estocástico
 def sgd(initial_point, x, y, eta, error2get, maxIter, minibatch_size):
-    w = initial_point
-    iterations = 0
-    
+    w = initial_point  
     minibatches_x = np.array_split(x, len(x)//minibatch_size)
     minibatches_y = np.array_split(y, len(y)//minibatch_size)
-    minibatches_x, minibatches_y = shuffle(minibatches_x, minibatches_y, random_state=seed)
     
-    for i in range(0, len(minibatches_x)):
-        error = abs(Err(minibatches_x[i], minibatches_y[i], w))
-        while not error < error2get and iterations < maxIter:
+    iterations = 0
+    parar = False
+    while not parar and iterations < maxIter:
+        minibatches_x, minibatches_y = shuffle(minibatches_x, minibatches_y, random_state=seed)
+        for i in range(0, len(minibatches_x)):
             w = w - eta*gradErr(minibatches_x[i], minibatches_y[i], w)
-            error = abs(Err(minibatches_x[i], minibatches_y[i], w))
+            error = Err(minibatches_x[i], minibatches_y[i], w)
+            parar = abs(error) < error2get
             iterations += 1
-        if error < error2get:
-            break
+            if parar:
+                break
     return w
 
 # Pseudoinversa	
 def pseudoinverse(x, y):
-    w = np.linalg.pinv(x)*y
+    w = np.matmul(np.linalg.pinv(x), y)
     return w
 
 
@@ -209,29 +209,35 @@ x, y = readData('datos/X_train.npy', 'datos/y_train.npy')
 # Lectura de los datos para el test
 x_test, y_test = readData('datos/X_test.npy', 'datos/y_test.npy')
 
-w = sgd(np.array([0.0] * len(x.T), dtype=np.float64), x, y, eta, error2get, maxIter, 24)
-print ('Bondad del resultado para grad. descendente estocastico:\n')
-print ("Ein: ", Err(x,y,w))
-print ("Eout: ", Err(x_test, y_test, w))
+maxIter = 10000
+w_sgd = sgd(np.array([0.0] * len(x.T), dtype=np.float64), x, y, eta, error2get, maxIter, 24)
+print ("Bondad del resultado para grad. descendente estocástico:\n")
+print ("Ein: ", Err(x,y,w_sgd))
+print ("Eout: ", Err(x_test, y_test, w_sgd))
 
-input("\n--- Pulsar tecla para continuar ---\n")
+w_pinv = pseudoinverse(x, y)
+print ("\nBondad del resultado para la pseudoinversa:\n")
+print ("Ein: ", Err(x,y,w_pinv))
+print ("Eout: ", Err(x_test, y_test, w_pinv))
 
-#Seguir haciendo el ejercicio...
+# input("\n--- Pulsar tecla para continuar ---\n")
 
-print("Ejercicio 2\n")
-# Simula datos en un cuadrado [-size,size]x[-size,size]
-def simula_unif(N, d, size):
-	return np.random.uniform(-size,size,(N,d))
+# #Seguir haciendo el ejercicio...
 
-def sign(x):
-	if x >= 0:
-		return 1
-	return -1
+# print("Ejercicio 2\n")
+# # Simula datos en un cuadrado [-size,size]x[-size,size]
+# def simula_unif(N, d, size):
+# 	return np.random.uniform(-size,size,(N,d))
 
-def f(x1, x2):
-	return sign(?) 
+# def sign(x):
+# 	if x >= 0:
+# 		return 1
+# 	return -1
 
-#Seguir haciendo el ejercicio...
+# def f(x1, x2):
+# 	return sign(?) 
+
+# #Seguir haciendo el ejercicio...
 
 
 
