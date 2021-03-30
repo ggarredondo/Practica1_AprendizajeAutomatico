@@ -173,11 +173,11 @@ def readData(file_x, file_y):
 
 # Función para calcular el error
 def Err(x,y,w):
-    return ((x*w - y)**2).mean(axis=0)
+    return ((np.matmul(w,x.T) - y)**2).mean(axis=0)
 
 # Gradiente de la función de error
 def gradErr(x, y, w):
-    return (2*x*(x*w - y)).mean(axis=0)
+    return (2*(np.matmul(w,x.T) - y)).mean(axis=0)
     
 # Gradiente Descendente Estocástico
 def sgd(initial_point, x, y, eta, error2get, maxIter, minibatch_size):
@@ -209,11 +209,7 @@ x, y = readData('datos/X_train.npy', 'datos/y_train.npy')
 # Lectura de los datos para el test
 x_test, y_test = readData('datos/X_test.npy', 'datos/y_test.npy')
 
-maxIter = 10000000000
-#print(x*np.array([0.0] * len(x.T), dtype=np.float64))
-#print(x)
-#print(np.array([0.0] * len(x.T), dtype=np.float64))
-#w = sgd(np.array([0.0] * len(x.T), dtype=np.float64), x, y, eta, error2get, maxIter, 24)
+w = sgd(np.array([0.0] * len(x.T), dtype=np.float64), x, y, eta, error2get, maxIter, 24)
 print ('Bondad del resultado para grad. descendente estocastico:\n')
 print ("Ein: ", Err(x,y,w))
 print ("Eout: ", Err(x_test, y_test, w))
