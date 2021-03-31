@@ -139,6 +139,8 @@ plt.title("Ejercicio 1.3.b. Para eta = " +str(eta)+ " y un máximo de " +str(max
 table.scale(2.5,2.5)
 plt.show()
 
+input("\n--- Pulsar tecla para continuar al ejercicio 2 ---\n")
+
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -207,6 +209,7 @@ def pseudoinverse(x, y):
 # Ejercicio 2.1 - Estimar un modelo de regresión lineal usando tanto el
 # algoritmo de gradiente descendente estócastico como la pseudo-inversa.
 print("-2.1-\n")
+
 # Lectura de los datos de entrenamiento
 x, y = readData('datos/X_train.npy', 'datos/y_train.npy')
 # Lectura de los datos para el test
@@ -239,7 +242,7 @@ plt.xlabel("Intensidad promedio")
 plt.ylabel("Simetría")
 plt.show()
 
-input("\n--- Pulsar tecla para continuar a la muestra de prueba ---\n")
+input("\n--- Pulsar tecla para mostrar la gráfica con la muestra de prueba ---\n")
 
 plt.plot(sgd_x, sgd_y, c="blue")
 plt.plot(pinv_x, pinv_y, c="red")
@@ -251,20 +254,32 @@ plt.xlabel("Intensidad promedio")
 plt.ylabel("Simetría")
 plt.show()
 
-# #Seguir haciendo el ejercicio...
+input("\n--- Pulsar tecla para continuar al ejercicio 2.2.a ---\n")
 
-# print("Ejercicio 2\n")
-# # Simula datos en un cuadrado [-size,size]x[-size,size]
-# def simula_unif(N, d, size):
-# 	return np.random.uniform(-size,size,(N,d))
+print("-2.2.a-\n")
 
-# def sign(x):
-# 	if x >= 0:
-# 		return 1
-# 	return -1
+# 2.2.a - Función que muestrea datos uniformemente en un cuadrado [-size,size]x[-size,size]
+def simula_unif(N, d, size):
+ 	return np.random.uniform(-size,size,(N,d))
+ 
+x_train = simula_unif(1000, 2, 1)
+plt.scatter(x_train[:,0], x_train[:,1])
+plt.title("Ejercicio 2.2.a. Muestra de entrenamiento uniforme")
+plt.show()
 
-# def f(x1, x2):
-# 	return sign(?) 
+# 2.2.b. - 
+def sign(x):
+ 	if x >= 0:
+         return 1
+ 	return -1
+
+def f(x1, x2):
+ 	return sign((x1-0.2)**2 + x2**2 - 0.6)
+
+def generar_ruido(y):
+    rng = np.random.default_rng()
+    for i in range(0, y.size//10):
+        y[rng.choice(y.size, replace=False)] *= -1
 
 # #Seguir haciendo el ejercicio...
 
