@@ -16,15 +16,15 @@ print("-Ejercicio 1-\n")
 def E(u,v):
     return (u**3*np.exp(v-2)-2*v**2*np.exp(-u))**2   
 
-#Derivada parcial de E con respecto a u
+# Derivada parcial de E con respecto a u
 def dEu(u,v):
     return 2*(u**3*np.exp(v-2)-2*v**2*np.exp(-u))*(3*u**2*np.exp(v-2)+2*v**2*np.exp(-u))
     
-#Derivada parcial de E con respecto a v
+# Derivada parcial de E con respecto a v
 def dEv(u,v):
     return 2*(u**3*np.exp(v-2)-2*v**2*np.exp(-u))*(u**3*np.exp(v-2)-4*v*np.exp(-u))
 
-#Gradiente de E (Ejercicio 1.2.a)
+# Gradiente de E (Ejercicio 1.2.a)
 def gradE(u,v):
     return np.array([dEu(u,v), dEv(u,v)])
 
@@ -51,7 +51,7 @@ w, it, descenso = gradient_descent(initial_point, eta, error2get, maxIter, E, gr
 
 # 1.2.b - ¿Cuántas iteraciones tarda el algoritmo en obtener por primera vez un
 # valor de E(u,v) inferior a 10^-14?
-print ("-1.2-\nNúmero de iteraciones: ", it)
+print ("-1.2-\n\nNúmero de iteraciones: ", it)
 # 1.2.c - ¿En qué coordenadas (u,v) se alcanzó por primera vez un valor igual o
 # menor a 10^-14 en el apartado anterior?
 print ("Coordenadas obtenidas: (", w[0], ", ", w[1], ")")
@@ -92,7 +92,7 @@ def gradF(x, y):
     return np.array([dFx(x, y), dFy(x, y)])
 
 # 1.3.a - Minimizar la función para (x0 = -1, y0 = 1), eta = 0.01 y 50 iteraciones
-# como máximo
+# como máximo. Repetir para eta = 0.1 .
 maxIter = 50
 initial_point = np.array([-1.0, 1.0], dtype=np.float64)
 w1, it1, descenso1 = gradient_descent(initial_point, 0.01, error2get, maxIter, F, gradF)
@@ -101,7 +101,7 @@ w2, it2, descenso2 = gradient_descent(initial_point, 0.1, error2get, maxIter, F,
 print("-1.3.a-\n")
 print ("Para eta = 0.01\nNúmero de iteraciones: ", it1)
 print ("Coordenadas obtenidas: (", w1[0], ", ", w1[1], ")")
-
+maxIter = 1000
 print ("\nPara eta = 0.1\nNúmero de iteraciones: ", it2)
 print ("Coordenadas obtenidas: (", w2[0], ", ", w2[1], ")")
 
@@ -204,7 +204,9 @@ def pseudoinverse(x, y):
     w = np.matmul(np.linalg.pinv(x), y)
     return w
 
-
+# Ejercicio 2.1 - Estimar un modelo de regresión lineal usando tanto el
+# algoritmo de gradiente descendente estócastico como la pseudo-inversa.
+print("-2.1-\n")
 # Lectura de los datos de entrenamiento
 x, y = readData('datos/X_train.npy', 'datos/y_train.npy')
 # Lectura de los datos para el test
@@ -212,14 +214,30 @@ x_test, y_test = readData('datos/X_test.npy', 'datos/y_test.npy')
 
 maxIter = 1000
 w_sgd = sgd(np.array([0.0] * len(x.T), dtype=np.float64), x, y, eta, error2get, maxIter, 24)
-print ("Bondad del resultado para grad. descendente estocástico:\n")
+print ("Bondad del resultado para grad. descendente estocástico:")
 print ("Ein: ", Err(x,y,w_sgd))
 print ("Eout: ", Err(x_test, y_test, w_sgd))
 
 w_pinv = pseudoinverse(x, y)
-print ("\nBondad del resultado para la pseudoinversa:\n")
+print ("\nBondad del resultado para la pseudoinversa:")
 print ("Ein: ", Err(x,y,w_pinv))
 print ("Eout: ", Err(x_test, y_test, w_pinv))
+
+sgd_x = np.linspace(0, 1, 2)
+sgd_y = (-w_sgd[0]-w_sgd[1]*sgd_x)/w_sgd[2]
+
+pinv_x = np.linspace(0, 1, 2)
+pinv_y = (-w_pinv[0]-w_pinv[1]*pinv_x)/w_pinv[2]
+
+plt.plot(sgd_x, sgd_y, c="blue")
+plt.plot(pinv_x, pinv_y, c="red")
+plt.scatter(x[np.where(y == label5), 1], x[np.where(y == label5), 2], c="yellow")
+plt.scatter(x[np.where(y == label1), 1], x[np.where(y == label1), 2], c="purple")
+plt.legend(("SGD", "Pinv", "5", "1"))
+plt.title("Ejercicio 2.1. SGD vs. Pseudoinversa para estimar 1 y 5 escritos a mano")
+plt.xlabel("Intensidad promedio")
+plt.ylabel("Simetría")
+plt.show()
 
 # input("\n--- Pulsar tecla para continuar ---\n")
 
