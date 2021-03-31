@@ -267,7 +267,8 @@ plt.scatter(x_train[:,0], x_train[:,1])
 plt.title("Ejercicio 2.2.a. Muestra de entrenamiento uniforme")
 plt.show()
 
-# 2.2.b. - 
+# 2.2.b. - Asignar etiquetas dado f(x1, x2) e introducir ruido sobre 10% de las
+# mismas
 def sign(x):
  	if x >= 0:
          return 1
