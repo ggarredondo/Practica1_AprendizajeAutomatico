@@ -234,12 +234,22 @@ plt.plot(pinv_x, pinv_y, c="red")
 plt.scatter(x[np.where(y == label5), 1], x[np.where(y == label5), 2], c="yellow")
 plt.scatter(x[np.where(y == label1), 1], x[np.where(y == label1), 2], c="purple")
 plt.legend(("SGD", "Pinv", "5", "1"))
-plt.title("Ejercicio 2.1. SGD vs. Pseudoinversa para estimar 1 y 5 escritos a mano")
+plt.title("Ejercicio 2.1. SGD vs. Pseudoinversa para X de entrenamiento")
 plt.xlabel("Intensidad promedio")
 plt.ylabel("Simetría")
 plt.show()
 
-# input("\n--- Pulsar tecla para continuar ---\n")
+input("\n--- Pulsar tecla para continuar a la muestra de prueba ---\n")
+
+plt.plot(sgd_x, sgd_y, c="blue")
+plt.plot(pinv_x, pinv_y, c="red")
+plt.scatter(x_test[np.where(y_test == label5), 1], x_test[np.where(y_test == label5), 2], c="yellow")
+plt.scatter(x_test[np.where(y_test == label1), 1], x_test[np.where(y_test == label1), 2], c="purple")
+plt.legend(("SGD", "Pinv", "5", "1"))
+plt.title("Ejercicio 2.1. SGD vs. Pseudoinversa para X de prueba")
+plt.xlabel("Intensidad promedio")
+plt.ylabel("Simetría")
+plt.show()
 
 # #Seguir haciendo el ejercicio...
 
