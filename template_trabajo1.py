@@ -98,7 +98,6 @@ initial_point = np.array([-1.0, 1.0], dtype=np.float64)
 w1, it1, descenso1 = gradient_descent(initial_point, 0.01, error2get, maxIter, F, gradF)
 w2, it2, descenso2 = gradient_descent(initial_point, 0.1, error2get, maxIter, F, gradF)
 
-print("-1.3.a-\n")
 print ("Para eta = 0.01\nNúmero de iteraciones: ", it1)
 print ("Coordenadas obtenidas: (", w1[0], ", ", w1[1], ")")
 maxIter = 1000
@@ -114,6 +113,8 @@ plt.legend(("eta = 0.01", "eta = 0.1"))
 plt.show()
 
 input("\n--- Pulsar tecla para continuar al ejercicio 1.3.b ---\n")
+print("Se muestra tabla...")
+
 eta = 0.01
 a, it, des = gradient_descent(np.array([-0.5, -0.5],dtype=np.float64), eta, error2get, maxIter, F, gradF)
 b, it, des = gradient_descent(np.array([1.0, 1.0],dtype=np.float64), eta, error2get, maxIter, F, gradF)
@@ -216,7 +217,7 @@ x, y = readData('datos/X_train.npy', 'datos/y_train.npy')
 x_test, y_test = readData('datos/X_test.npy', 'datos/y_test.npy')
 
 maxIter = 1000
-w_sgd = sgd(np.array([0.0] * len(x.T), dtype=np.float64), x, y, eta, error2get, maxIter, 24)
+w_sgd = sgd(np.array([0.0] * x.shape[1], dtype=np.float64), x, y, eta, error2get, maxIter, 24)
 print ("Bondad del resultado para grad. descendente estocástico:")
 print ("Ein: ", Err(x,y,w_sgd))
 print ("Eout: ", Err(x_test, y_test, w_sgd))
@@ -243,6 +244,7 @@ plt.ylabel("Simetría")
 plt.show()
 
 input("\n--- Pulsar tecla para mostrar la gráfica con la muestra de prueba ---\n")
+print("Se muestra gráfica...")
 
 plt.plot(sgd_x, sgd_y, c="blue")
 plt.plot(pinv_x, pinv_y, c="red")
@@ -256,19 +258,26 @@ plt.show()
 
 input("\n--- Pulsar tecla para continuar al ejercicio 2.2.a ---\n")
 
-print("-2.2.a-\n")
+# Ejercicio 2.2
 
 # 2.2.a - Función que muestrea datos uniformemente en un cuadrado [-size,size]x[-size,size]
+
 def simula_unif(N, d, size):
  	return np.random.uniform(-size,size,(N,d))
  
 x_train = simula_unif(1000, 2, 1)
+print("La muestra de entrenamiento: ")
+print(x_train)
 plt.scatter(x_train[:,0], x_train[:,1])
 plt.title("Ejercicio 2.2.a. Muestra de entrenamiento uniforme")
 plt.show()
 
+input("\n--- Pulsar tecla para continuar al ejercicio 2.2.b---\n")
+
 # 2.2.b. - Asignar etiquetas dado f(x1, x2) e introducir ruido sobre 10% de las
 # mismas
+print("Se muestra gráfica...")
+
 def sign(x):
  	if x >= 0:
          return 1
@@ -282,7 +291,38 @@ def generar_ruido(y):
     for i in range(0, y.size//10):
         y[rng.choice(y.size, replace=False)] *= -1
 
-# #Seguir haciendo el ejercicio...
+y_train = np.array([f(x1, x2) for x1, x2 in x_train], dtype=np.float64)
+plt.scatter(x_train[np.where(y_train == 1), 0], x_train[np.where(y_train == 1), 1], c="yellow")
+plt.scatter(x_train[np.where(y_train == -1), 0], x_train[np.where(y_train == -1), 1], c="purple")
+plt.legend(("+1","-1"), loc="upper right")
+plt.title("Ejercicio 2.2.b - Muestra etiquetada sin ruido")
+plt.show()
 
+input("\n--- Pulsar tecla para continuar con el ejercicio 2.2.b---\n")
+print("Se muestra gráfica...")
 
+generar_ruido(y_train)
+plt.scatter(x_train[np.where(y_train == 1), 0], x_train[np.where(y_train == 1), 1], c="yellow")
+plt.scatter(x_train[np.where(y_train == -1), 0], x_train[np.where(y_train == -1), 1], c="purple")
+plt.legend(("+1","-1"), loc="upper right")
+plt.title("Ejercicio 2.2.b - Muestra etiquetada con ruido")
+plt.show()
 
+input("\n--- Pulsar tecla para continuar al ejercicio 2.2.c---\n")
+
+# 2.2.c - Ajustar un modelo de regresión lineal al conjunto de datos generado y estimar w con SGD
+
+x_train = np.hstack((np.ones((x_train.shape[0], 1)), x_train))
+w_sgd = sgd(np.array([0.0] * x_train.shape[1], dtype=np.float64), x_train, y_train, eta, error2get, maxIter, 24)
+print("Ein: ", Err(x_train, y_train, w_sgd))
+
+sgd_x = np.linspace(-1, 1, 2)
+sgd_y = (-w_sgd[0]-w_sgd[1]*sgd_x)/w_sgd[2]
+
+plt.plot(sgd_x, sgd_y, c="red")
+plt.ylim(-1.,1.)
+plt.scatter(x_train[np.where(y_train == 1), 1], x_train[np.where(y_train == 1), 2], c="yellow")
+plt.scatter(x_train[np.where(y_train == -1), 1], x_train[np.where(y_train == -1), 2], c="purple")
+plt.legend(("SGD", "+1", "-1"), loc="upper right")
+plt.title("Ejercicio 2.2.c Regresión lineal para la muestra generada")
+plt.show()
