@@ -272,7 +272,7 @@ plt.scatter(x_train[:,0], x_train[:,1])
 plt.title("Ejercicio 2.2.a. Muestra de entrenamiento uniforme")
 plt.show()
 
-input("\n--- Pulsar tecla para continuar al ejercicio 2.2.b---\n")
+input("\n--- Pulsar tecla para continuar al ejercicio 2.2.b ---\n")
 
 # 2.2.b. - Asignar etiquetas dado f(x1, x2) e introducir ruido sobre 10% de las
 # mismas.
@@ -298,7 +298,7 @@ plt.legend(("+1","-1"), loc="upper right")
 plt.title("Ejercicio 2.2.b - Muestra etiquetada sin ruido")
 plt.show()
 
-input("\n--- Pulsar tecla para continuar con el ejercicio 2.2.b---\n")
+input("\n--- Pulsar tecla para continuar con el ejercicio 2.2.b ---\n")
 print("Se muestra gráfica...")
 
 generar_ruido(y_train, seed)
@@ -308,55 +308,66 @@ plt.legend(("+1","-1"), loc="upper right")
 plt.title("Ejercicio 2.2.b - Muestra etiquetada con ruido")
 plt.show()
 
-input("\n--- Pulsar tecla para continuar al ejercicio 2.2.c---\n")
+input("\n--- Pulsar tecla para continuar al ejercicio 2.2.c ---\n")
 
 # 2.2.c - Ajustar un modelo de regresión lineal al conjunto de datos generado y estimar w con SGD.
 
-x_train = np.hstack((np.ones((x_train.shape[0], 1)), x_train))
-w_sgd = sgd(np.array([0.0] * x_train.shape[1], dtype=np.float64), x_train, y_train, eta, error2get, maxIter, 24)
-print("Ein: ", Err(x_train, y_train, w_sgd))
+X_train = np.hstack((np.ones((x_train.shape[0], 1)), x_train))
+w_sgd = sgd(np.array([0.0] * X_train.shape[1], dtype=np.float64), X_train, y_train, eta, error2get, maxIter, 24)
+print("Ein: ", Err(X_train, y_train, w_sgd))
 
 sgd_x = np.linspace(-1, 1, 2)
 sgd_y = (-w_sgd[0]-w_sgd[1]*sgd_x)/w_sgd[2]
 
 plt.plot(sgd_x, sgd_y, c="red")
 plt.ylim(-1.,1.)
-plt.scatter(x_train[np.where(y_train == 1), 1], x_train[np.where(y_train == 1), 2], c="yellow")
-plt.scatter(x_train[np.where(y_train == -1), 1], x_train[np.where(y_train == -1), 2], c="purple")
+plt.scatter(X_train[np.where(y_train == 1), 1], X_train[np.where(y_train == 1), 2], c="yellow")
+plt.scatter(X_train[np.where(y_train == -1), 1], X_train[np.where(y_train == -1), 2], c="purple")
 plt.legend(("SGD", "+1", "-1"), loc="upper right")
 plt.title("Ejercicio 2.2.c Regresión lineal para la muestra generada")
 plt.show()
 
-input("\n--- Pulsar tecla para continuar al ejercicio 2.2.d---\n")
+input("\n--- Pulsar tecla para continuar al ejercicio 2.2.d ---\n")
 
 # 2.2.d - Ejecutar el experimento definido de a) a c) 1000 veces, calculando el Ein medio
 # para las 1000 muestras y el Eout medio para otras 1000 muestras diferentes.
 
-def EinEout_medio(x_train, y_train, iteraciones):
+def generar_vectorC_lineal(x):
+    return np.hstack((np.ones((x.shape[0], 1)), x))
+
+def EinEout_medio(x_train, y_train, iteraciones, maxIter_sgd, generar_vectorC):
     Ein = 0.
     Eout = 0.
+    x_train = generar_vectorC(x_train)
+    
     for i in range(0, iteraciones):
         x = simula_unif(1000, 2, 1)
         y = np.array([f(x1, x2) for x1, x2 in x], dtype=np.float64)
-        x = np.hstack((np.ones((x.shape[0], 1)), x))
+        x = generar_vectorC(x)
         generar_ruido(y, seed+i)
         
-        w = sgd(np.array([0.0] * x_train.shape[1], dtype=np.float64), x_train, y_train, 0.01, 1e-14, 50, 24)
+        w = sgd(np.array([0.0] * x_train.shape[1], dtype=np.float64), x_train, y_train, 0.01, 1e-14, maxIter_sgd, 24)
         Ein += Err(x_train, y_train, w)
         Eout += Err(x, y, w)
     return Ein/iteraciones, Eout/iteraciones
 
-Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000)
+Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 100, generar_vectorC_lineal)
 print("Ein medio: ", Ein_medio)
 print("Eout medio: ", Eout_medio)
+
+input("\n--- Pulsar tecla para continuar al experimento con características no lineales ---\n")
 
 # Repetir el mismo experimento anterior pero usando características no lineales.
 # Se utiliza el siguiente vector de características: phi²(x) = (1,x1,x2,x1*x1,x1²,x2²).
 # Ajustar el nuevo modelo de regresión lineal y calcular w. Calcular los errores promedio Ein y Eout.
 
+def generar_vectorC_noLineal(x):
+    x = np.hstack((np.ones((x.shape[0], 1)), x))
+    return np.hstack((x, np.array([(x[:,1]*x[:,2]), (x[:,1]**2), (x[:,2]**2)]).T))
 
-
-
+Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 1000, generar_vectorC_noLineal)
+print("Ein medio: ", Ein_medio)
+print("Eout medio: ", Eout_medio)
 
 
 
