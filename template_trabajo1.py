@@ -28,7 +28,7 @@ def dEv(u,v):
 def gradE(u,v):
     return np.array([dEu(u,v), dEv(u,v)])
 
-# Ejercicio 1.1 - Implementar el algoritmo de gradiente descendente
+# Ejercicio 1.1 - Implementar el algoritmo de gradiente descendente.
 def gradient_descent(initial_point, eta, error2get, maxIter, E, gradE):
     iterations = 0
     w = initial_point
@@ -77,7 +77,7 @@ plt.show()
 
 input("\n--- Pulsar tecla para continuar al ejercicio 1.3.a ---\n")
 
-# Ejercicio 1.3
+# Ejercicio 1.3 
 
 def F(x, y):
     return (x+2)**2 + 2*(y-2)**2 + 2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y) 
@@ -260,7 +260,7 @@ input("\n--- Pulsar tecla para continuar al ejercicio 2.2.a ---\n")
 
 # Ejercicio 2.2
 
-# 2.2.a - Función que muestrea datos uniformemente en un cuadrado [-size,size]x[-size,size]
+# 2.2.a - Función que muestrea datos uniformemente en un cuadrado [-size,size]x[-size,size] .
 
 def simula_unif(N, d, size):
  	return np.random.uniform(-size,size,(N,d))
@@ -275,7 +275,7 @@ plt.show()
 input("\n--- Pulsar tecla para continuar al ejercicio 2.2.b---\n")
 
 # 2.2.b. - Asignar etiquetas dado f(x1, x2) e introducir ruido sobre 10% de las
-# mismas
+# mismas.
 print("Se muestra gráfica...")
 
 def sign(x):
@@ -286,8 +286,8 @@ def sign(x):
 def f(x1, x2):
  	return sign((x1-0.2)**2 + x2**2 - 0.6)
 
-def generar_ruido(y):
-    rng = np.random.default_rng()
+def generar_ruido(y, seed):
+    rng = np.random.default_rng(seed)
     for i in range(0, y.size//10):
         y[rng.choice(y.size, replace=False)] *= -1
 
@@ -301,7 +301,7 @@ plt.show()
 input("\n--- Pulsar tecla para continuar con el ejercicio 2.2.b---\n")
 print("Se muestra gráfica...")
 
-generar_ruido(y_train)
+generar_ruido(y_train, seed)
 plt.scatter(x_train[np.where(y_train == 1), 0], x_train[np.where(y_train == 1), 1], c="yellow")
 plt.scatter(x_train[np.where(y_train == -1), 0], x_train[np.where(y_train == -1), 1], c="purple")
 plt.legend(("+1","-1"), loc="upper right")
@@ -310,7 +310,7 @@ plt.show()
 
 input("\n--- Pulsar tecla para continuar al ejercicio 2.2.c---\n")
 
-# 2.2.c - Ajustar un modelo de regresión lineal al conjunto de datos generado y estimar w con SGD
+# 2.2.c - Ajustar un modelo de regresión lineal al conjunto de datos generado y estimar w con SGD.
 
 x_train = np.hstack((np.ones((x_train.shape[0], 1)), x_train))
 w_sgd = sgd(np.array([0.0] * x_train.shape[1], dtype=np.float64), x_train, y_train, eta, error2get, maxIter, 24)
@@ -326,3 +326,37 @@ plt.scatter(x_train[np.where(y_train == -1), 1], x_train[np.where(y_train == -1)
 plt.legend(("SGD", "+1", "-1"), loc="upper right")
 plt.title("Ejercicio 2.2.c Regresión lineal para la muestra generada")
 plt.show()
+
+input("\n--- Pulsar tecla para continuar al ejercicio 2.2.d---\n")
+
+# 2.2.d - Ejecutar el experimento definido de a) a c) 1000 veces, calculando el Ein medio
+# para las 1000 muestras y el Eout medio para otras 1000 muestras diferentes.
+
+def EinEout_medio(x_train, y_train, iteraciones):
+    Ein = 0.
+    Eout = 0.
+    for i in range(0, iteraciones):
+        x = simula_unif(1000, 2, 1)
+        y = np.array([f(x1, x2) for x1, x2 in x], dtype=np.float64)
+        x = np.hstack((np.ones((x.shape[0], 1)), x))
+        generar_ruido(y, seed+i)
+        
+        w = sgd(np.array([0.0] * x_train.shape[1], dtype=np.float64), x_train, y_train, 0.01, 1e-14, 50, 24)
+        Ein += Err(x_train, y_train, w)
+        Eout += Err(x, y, w)
+    return Ein/iteraciones, Eout/iteraciones
+
+Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000)
+print("Ein medio: ", Ein_medio)
+print("Eout medio: ", Eout_medio)
+
+# Repetir el mismo experimento anterior pero usando características no lineales.
+# Se utiliza el siguiente vector de características: phi²(x) = (1,x1,x2,x1*x1,x1²,x2²).
+# Ajustar el nuevo modelo de regresión lineal y calcular w. Calcular los errores promedio Ein y Eout.
+
+
+
+
+
+
+
