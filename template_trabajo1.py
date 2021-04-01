@@ -82,12 +82,15 @@ input("\n--- Pulsar tecla para continuar al ejercicio 1.3.a ---\n")
 def F(x, y):
     return (x+2)**2 + 2*(y-2)**2 + 2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y) 
 
+# Derivada parcial de F con respecto a x
 def dFx(x, y):
     return 2*(x+2) + 4*np.pi*np.cos(2*np.pi*x)*np.sin(2*np.pi*y)
 
+# Derivada parcial de F con respecto a y
 def dFy(x, y):
     return 4*(y-2) + 4*np.pi*np.sin(2*np.pi*x)*np.cos(2*np.pi*y)
 
+# Gradiente de F
 def gradF(x, y):
     return np.array([dFx(x, y), dFy(x, y)])
 
@@ -100,7 +103,7 @@ w2, it2, descenso2 = gradient_descent(initial_point, 0.1, error2get, maxIter, F,
 
 print ("Para eta = 0.01\nNúmero de iteraciones: ", it1)
 print ("Coordenadas obtenidas: (", w1[0], ", ", w1[1], ")")
-maxIter = 1000
+
 print ("\nPara eta = 0.1\nNúmero de iteraciones: ", it2)
 print ("Coordenadas obtenidas: (", w2[0], ", ", w2[1], ")")
 
@@ -197,9 +200,9 @@ def sgd(initial_point, x, y, eta, error2get, maxIter, minibatch_size):
             w = w - eta*gradErr(minibatches_x[i], minibatches_y[i], w)
             error = Err(minibatches_x[i], minibatches_y[i], w)
             parar = abs(error) < error2get
-            iterations += 1
             if parar:
                 break
+        iterations += 1
     return w
 
 # Pseudoinversa	
@@ -216,7 +219,7 @@ x, y = readData('datos/X_train.npy', 'datos/y_train.npy')
 # Lectura de los datos para el test
 x_test, y_test = readData('datos/X_test.npy', 'datos/y_test.npy')
 
-maxIter = 1000
+maxIter = 100
 w_sgd = sgd(np.array([0.0] * x.shape[1], dtype=np.float64), x, y, eta, error2get, maxIter, 24)
 print ("Bondad del resultado para grad. descendente estocástico:")
 print ("Ein: ", Err(x,y,w_sgd))
@@ -351,7 +354,7 @@ def EinEout_medio(x_train, y_train, iteraciones, maxIter_sgd, generar_vectorC):
         Eout += Err(x, y, w)
     return Ein/iteraciones, Eout/iteraciones
 
-Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 100, generar_vectorC_lineal)
+Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 25, generar_vectorC_lineal)
 print("Ein medio: ", Ein_medio)
 print("Eout medio: ", Eout_medio)
 
@@ -365,9 +368,10 @@ def generar_vectorC_noLineal(x):
     x = np.hstack((np.ones((x.shape[0], 1)), x))
     return np.hstack((x, np.array([(x[:,1]*x[:,2]), (x[:,1]**2), (x[:,2]**2)]).T))
 
-Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 1000, generar_vectorC_noLineal)
+Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 25, generar_vectorC_noLineal)
 print("Ein medio: ", Ein_medio)
 print("Eout medio: ", Eout_medio)
+
 
 
 
