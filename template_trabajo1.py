@@ -225,12 +225,10 @@ maxIter = 100
 w_sgd = sgd(np.array([0.0] * x.shape[1], dtype=np.float64), x, y, eta, error2get, maxIter, 24)
 print ("Bondad del resultado para grad. descendente estocástico:")
 print ("Ein: ", Err(x,y,w_sgd))
-print ("Eout: ", Err(x_test, y_test, w_sgd))
 
 w_pinv = pseudoinverse(x, y)
 print ("\nBondad del resultado para la pseudoinversa:")
 print ("Ein: ", Err(x,y,w_pinv))
-print ("Eout: ", Err(x_test, y_test, w_pinv))
 
 sgd_x = np.linspace(0, 1, 2)
 sgd_y = (-w_sgd[0]-w_sgd[1]*sgd_x)/w_sgd[2]
@@ -249,7 +247,10 @@ plt.ylabel("Simetría")
 plt.show()
 
 input("\n--- Pulsar tecla para mostrar la gráfica con la muestra de prueba ---\n")
-print("Se muestra gráfica...")
+print ("Bondad del resultado para grad. descendente estocástico:")
+print ("Eout: ", Err(x_test, y_test, w_sgd))
+print ("\nBondad del resultado para la pseudoinversa:")
+print ("Eout: ", Err(x_test, y_test, w_pinv))
 
 plt.plot(sgd_x, sgd_y, c="blue")
 plt.plot(pinv_x, pinv_y, c="red")
@@ -370,30 +371,15 @@ def generar_vectorC_noLineal(x):
     x = np.hstack((np.ones((x.shape[0], 1)), x))
     return np.hstack((x, np.array([(x[:,1]*x[:,2]), (x[:,1]**2), (x[:,2]**2)]).T))
 
-# Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 25, generar_vectorC_noLineal)
-# print("Ein medio: ", Ein_medio)
-# print("Eout medio: ", Eout_medio)
+Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 25, generar_vectorC_noLineal)
+print("Ein medio: ", Ein_medio)
+print("Eout medio: ", Eout_medio)
 
 input("\n--- Pulsar tecla para continuar al ejercicio bonus ---\n")
 print("-BONUS.a-\n")
 
 # BONUS: Método de Newton
 # Implementar el algoritmo de minimización de Newton para el F(x,y) dado en el ejercicio 1.3.
-
-# def F(x, y):
-#     return (x+2)**2 + 2*(y-2)**2 + 2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y) 
-
-# # Derivada parcial de F con respecto a x
-# def dFx(x, y):
-#     return 2*(x+2) + 4*np.pi*np.cos(2*np.pi*x)*np.sin(2*np.pi*y)
-
-# # Derivada parcial de F con respecto a y
-# def dFy(x, y):
-#     return 4*(y-2) + 4*np.pi*np.sin(2*np.pi*x)*np.cos(2*np.pi*y)
-
-# # Gradiente de F
-# def gradF(x, y):
-#     return np.array([dFx(x, y), dFy(x, y)])
 
 def d2Fx(x, y):
     return -8*np.pi**2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y) + 2
@@ -423,8 +409,8 @@ def metodo_de_newton(initial_point, eta, error2get, maxIter):
 # BONUS.a - Minimizar la función para (x0 = -1, y0 = 1), eta = 0.01 y 50 iteraciones
 # como máximo. Repetir para eta = 0.1 .
 
-w_grad1 = w1
-descenso_grad1 = descenso1
+descenso1_grad = descenso1
+descenso2_grad = descenso2
 
 maxIter = 50
 initial_point = np.array([-1.0, 1.0], dtype=np.float64)
@@ -441,13 +427,58 @@ print ("Ein: ", F(w2[0], w2[1]))
 
 plt.plot(descenso1[:,0], descenso1[:,1])
 plt.plot(descenso2[:,0], descenso2[:,1], "r")
-plt.title("Ejercicio 1.3.a. Método de netwon para F(x,y)")
+plt.title("BONUS.a. Método de netwon para F(x,y)")
 plt.xlabel("Iteraciones")
 plt.ylabel("F(x,y)")
 plt.legend(("eta = 0.01", "eta = 0.1"))
 plt.show()
 
+input("\n--- Pulsar tecla para continuar al ejercicio BONUS.b ---\n")
+print("Se muestra tabla...")
 
+eta = 0.01
+a, it, des = metodo_de_newton(np.array([-0.5, -0.5],dtype=np.float64), eta, error2get, maxIter)
+b, it, des = metodo_de_newton(np.array([1.0, 1.0],dtype=np.float64), eta, error2get, maxIter)
+c, it, des = metodo_de_newton(np.array([2.1, -2.1],dtype=np.float64), eta, error2get, maxIter)
+d, it, des = metodo_de_newton(np.array([-3.0, 3.0],dtype=np.float64), eta, error2get, maxIter)
+e, it, des = metodo_de_newton(np.array([-2.0, 2.0],dtype=np.float64), eta, error2get, maxIter)
+valores = np.array([np.append(a, F(a[0], a[1])), np.append(b, F(b[0], b[1])),
+                    np.append(c, F(c[0], c[1])), np.append(d, F(d[0], d[1])),
+                    np.append(e, F(e[0], e[1]))])
 
+fig, ax = plt.subplots()
+ax.axis("off")
+table = ax.table(cellText=valores, 
+          colLabels=["x","y","F(x,y)"],
+          rowLabels=["(-0.5,-0.5)",
+                     "(1,1)",
+                     "(2.1,-2.1)",
+                     "(-3,3)",
+                     "(-2,2)"],
+          loc="center")
 
+plt.title("Ejercicio BONUS.b. Para eta = " +str(eta)+ " y un máximo de " +str(maxIter)+ " iteraciones")
+table.scale(2.5,2.5)
+plt.show()
 
+input("\n--- Pulsar tecla para continuar a la comparación Grad. descendente / Newton ---\n")
+print("Se muestra gráfica...")
+
+plt.plot(descenso1_grad[:,0], descenso1_grad[:,1])
+plt.plot(descenso1[:,0], descenso1[:,1], "r")
+plt.title("Grad. descendente vs. Newton para eta = 0.01")
+plt.xlabel("Iteraciones")
+plt.ylabel("F(x,y)")
+plt.legend(("Grad. descendente", "Newton"))
+plt.show()
+
+input("\n--- Pulsar tecla para continuar a la comparación para eta = 0.1 ---\n")
+print("Se muestra gráfica...")
+
+plt.plot(descenso2_grad[:,0], descenso2_grad[:,1])
+plt.plot(descenso2[:,0], descenso2[:,1], "r")
+plt.title("Grad. descendente vs. Newton para eta = 0.1")
+plt.xlabel("Iteraciones")
+plt.ylabel("F(x,y)")
+plt.legend(("Grad. descendente", "Newton"))
+plt.show()
