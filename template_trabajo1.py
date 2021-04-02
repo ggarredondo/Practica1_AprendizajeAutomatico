@@ -103,9 +103,11 @@ w2, it2, descenso2 = gradient_descent(initial_point, 0.1, error2get, maxIter, F,
 
 print ("Para eta = 0.01\nNúmero de iteraciones: ", it1)
 print ("Coordenadas obtenidas: (", w1[0], ", ", w1[1], ")")
+print ("Ein: ", F(w1[0], w1[1]))
 
 print ("\nPara eta = 0.1\nNúmero de iteraciones: ", it2)
 print ("Coordenadas obtenidas: (", w2[0], ", ", w2[1], ")")
+print ("Ein: ", F(w2[0], w2[1]))
 
 plt.plot(descenso1[:,0], descenso1[:,1])
 plt.plot(descenso2[:,0], descenso2[:,1], "r")
@@ -354,11 +356,11 @@ def EinEout_medio(x_train, y_train, iteraciones, maxIter_sgd, generar_vectorC):
         Eout += Err(x, y, w)
     return Ein/iteraciones, Eout/iteraciones
 
-Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 25, generar_vectorC_lineal)
+Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 10, generar_vectorC_lineal)
 print("Ein medio: ", Ein_medio)
 print("Eout medio: ", Eout_medio)
 
-input("\n--- Pulsar tecla para continuar al experimento con características no lineales ---\n")
+input("\n--- Pulsar tecla para continuar con el experimento con características no lineales ---\n")
 
 # Repetir el mismo experimento anterior pero usando características no lineales.
 # Se utiliza el siguiente vector de características: phi²(x) = (1,x1,x2,x1*x1,x1²,x2²).
@@ -368,9 +370,83 @@ def generar_vectorC_noLineal(x):
     x = np.hstack((np.ones((x.shape[0], 1)), x))
     return np.hstack((x, np.array([(x[:,1]*x[:,2]), (x[:,1]**2), (x[:,2]**2)]).T))
 
-Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 25, generar_vectorC_noLineal)
-print("Ein medio: ", Ein_medio)
-print("Eout medio: ", Eout_medio)
+# Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 25, generar_vectorC_noLineal)
+# print("Ein medio: ", Ein_medio)
+# print("Eout medio: ", Eout_medio)
+
+input("\n--- Pulsar tecla para continuar al ejercicio bonus ---\n")
+print("-BONUS.a-\n")
+
+# BONUS: Método de Newton
+# Implementar el algoritmo de minimización de Newton para el F(x,y) dado en el ejercicio 1.3.
+
+# def F(x, y):
+#     return (x+2)**2 + 2*(y-2)**2 + 2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y) 
+
+# # Derivada parcial de F con respecto a x
+# def dFx(x, y):
+#     return 2*(x+2) + 4*np.pi*np.cos(2*np.pi*x)*np.sin(2*np.pi*y)
+
+# # Derivada parcial de F con respecto a y
+# def dFy(x, y):
+#     return 4*(y-2) + 4*np.pi*np.sin(2*np.pi*x)*np.cos(2*np.pi*y)
+
+# # Gradiente de F
+# def gradF(x, y):
+#     return np.array([dFx(x, y), dFy(x, y)])
+
+def d2Fx(x, y):
+    return -8*np.pi**2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y) + 2
+
+def d2Fy(x, y):
+    return -8*np.pi**2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y) + 4
+
+def d2Fxy(x, y):
+    return 8*np.pi**2*np.cos(2*np.pi*x)*np.cos(2*np.pi*y)
+
+def H(x, y):
+    return np.array([[d2Fx(x,y), d2Fxy(x,y)], [d2Fxy(x,y), d2Fy(x,y)]], dtype=np.float64)
+
+def metodo_de_newton(initial_point, eta, error2get, maxIter):
+    iterations = 0
+    w = initial_point
+    error = F(w[0], w[1])
+    descenso = np.array([iterations, error],dtype=np.float64)
+    
+    while not abs(error) < error2get and iterations < maxIter:
+        w = w - eta*np.matmul(H(w[0], w[1])**-1, gradF(w[0], w[1]))
+        error = F(w[0], w[1])
+        iterations += 1
+        descenso = np.row_stack((descenso, np.array([iterations, error])))
+    return w, iterations, descenso
+
+# BONUS.a - Minimizar la función para (x0 = -1, y0 = 1), eta = 0.01 y 50 iteraciones
+# como máximo. Repetir para eta = 0.1 .
+
+w_grad1 = w1
+descenso_grad1 = descenso1
+
+maxIter = 50
+initial_point = np.array([-1.0, 1.0], dtype=np.float64)
+w1, it1, descenso1 = metodo_de_newton(initial_point, 0.01, error2get, maxIter)
+w2, it2, descenso2 = metodo_de_newton(initial_point, 0.1, error2get, maxIter)
+
+print ("Para eta = 0.01\nNúmero de iteraciones: ", it1)
+print ("Coordenadas obtenidas: (", w1[0], ", ", w1[1], ")")
+print ("Ein: ", F(w1[0], w1[1]))
+
+print ("\nPara eta = 0.1\nNúmero de iteraciones: ", it2)
+print ("Coordenadas obtenidas: (", w2[0], ", ", w2[1], ")")
+print ("Ein: ", F(w2[0], w2[1]))
+
+plt.plot(descenso1[:,0], descenso1[:,1])
+plt.plot(descenso2[:,0], descenso2[:,1], "r")
+plt.title("Ejercicio 1.3.a. Método de netwon para F(x,y)")
+plt.xlabel("Iteraciones")
+plt.ylabel("F(x,y)")
+plt.legend(("eta = 0.01", "eta = 0.1"))
+plt.show()
+
 
 
 
