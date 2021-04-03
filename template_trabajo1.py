@@ -35,7 +35,7 @@ def gradE(u,v):
 # Ejercicio 1.1 - Implementar el algoritmo de gradiente descendente.
 # Como argumentos de entrada tenemos el punto inicial desde donde el gradiente descendente
 # va a comenzar a minimizar, la tasa de aprendizaje η (eta), el valor mínimo buscado,
-# el número de iteraciones máxima, la función a minimizar y el gradiente de la función.
+# el número de iteraciones máximo, la función a minimizar y el gradiente de la función.
 # La función y el gradiente son también argumentos para poder reutilizar el código
 # en el apartado 1.3.
 def gradient_descent(initial_point, eta, error2get, maxIter, E, gradE):
@@ -43,7 +43,7 @@ def gradient_descent(initial_point, eta, error2get, maxIter, E, gradE):
     w = initial_point # Asignamos a w el punto inicial.
     error = E(w[0], w[1]) # Calculamos el valor de la función dado el punto inicial.
     descenso = np.array([iterations, error],dtype=np.float64) # Guardamos en un vector el número de iteraciones y
-                                                              # el valor de la función actual para su posterior
+                                                              # el valor de la función actuales para su posterior
                                                               # visualización.
                                                               
     # Mientras el valor actual de la función no sea menor que el valor mínimo buscado y el número de
@@ -151,6 +151,10 @@ plt.legend(("eta = 0.01", "eta = 0.1"))
 plt.show()
 
 input("\n--- Pulsar tecla para continuar al ejercicio 1.3.b ---\n")
+
+# 1.3.b. - Obtener el valor mínimo y los valores de las variables (x,y) en donde
+# se alcanzan cuando el punto de inicio se fija en: (-0.5, -0.5), (1, 1), (2.1, -2.1),
+# (-3, 3), (-2, 2). Generar una tabla con los valores obtenidos.
 print("Se muestra tabla...")
 
 # Cambiamos la tasa de aprendizaje a 0.01 y calculamos el descenso para todos los puntos pedidos.
@@ -483,39 +487,67 @@ print("-BONUS.a-\n")
 
 # BONUS: Método de Newton
 # Implementar el algoritmo de minimización de Newton para el F(x,y) dado en el ejercicio 1.3.
+# Para ello tenemos que calcular la matriz Hessiana, siendo en este caso:
+# ( d²f/dx²   d²f/dxdy )
+# ( d²f/dydx  d²f/dy² )
+# Se ha implementado definiendo las siguientes funciones.
+
+# Derivada segunda parcial de F respecto de x.
 def d2Fx(x, y):
     return -8*np.pi**2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y) + 2
 
+# Derivada segunda parcial de F respecto de y.
 def d2Fy(x, y):
     return -8*np.pi**2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y) + 4
 
+# Derivada de F respecto de x e y.
 def d2Fxy(x, y):
     return 8*np.pi**2*np.cos(2*np.pi*x)*np.cos(2*np.pi*y)
 
+# Derivada de F respecto de y e x, que en este particular caso es igual que la anterior.
 d2Fyx = d2Fxy
 
+# Con eso definimos la matriz Hessiana como una función, que devuelve la matriz en un vector
+# de numpy.
 def H(x, y):
     return np.array([[d2Fx(x,y), d2Fxy(x,y)], [d2Fyx(x,y), d2Fy(x,y)]], dtype=np.float64)
 
+# Método de Newton.
+# Como argumentos de entrada tenemos el punto inicial, la tasa de aprendizaje η (eta), 
+# el error mínimo buscado y el número de iteraciones máximo.
 def metodo_de_newton(initial_point, eta, error2get, maxIter):
-    iterations = 0
-    w = initial_point
-    error = F(w[0], w[1])
-    descenso = np.array([iterations, error],dtype=np.float64)
+    iterations = 0 # Inicializamos el número de iteraciones a 0.
+    w = initial_point # Asignamos el punto inicial a w.
+    error = F(w[0], w[1]) # Calculamos el error actual dado el punto inicial.
+    descenso = np.array([iterations, error],dtype=np.float64) # Generamos un vector con el número de
+                                                              # iteraciones y el error actuales para
+                                                              # la posterior visualización.
     
+    # Mientras el error no sea menor que el error mínimo buscado y el número de
+    # iteraciones no superen las iteraciones máximas...
     while not abs(error) < error2get and iterations < maxIter:
-        w = w - eta*np.matmul(H(w[0], w[1])**-1, gradF(w[0], w[1]))
-        error = F(w[0], w[1])
-        iterations += 1
-        descenso = np.row_stack((descenso, np.array([iterations, error])))
+        w = w - eta*np.matmul(H(w[0], w[1])**-1, gradF(w[0], w[1])) # Se calcula w dada la ecuación
+                                                                    # xn+1 = xn - η * Hf(xn)^-1 * ▽f(xn) .
+        error = F(w[0], w[1]) # Se calcula el error dado el nuevo w.
+        iterations += 1 # Se cuenta una iteración más.
+        descenso = np.row_stack((descenso, np.array([iterations, error]))) # Se añade al vector 'decenso' las
+                                                                           # iteraciones y error actuales.
+                                                                           
+    # Finalmente se devuelve el w obtenido, el número de iteraciones necesitado y el vector 'decenso' con
+    # el "camino" entero seguido por el algoritmo.
     return w, iterations, descenso
 
-# BONUS.a - Minimizar la función para (x0 = -1, y0 = 1), eta = 0.01 y 50 iteraciones
-# como máximo. Repetir para eta = 0.1 .
+# BONUS.a - Minimizar la función para (x0 = -1, y0 = 1), η = 0.01 y 50 iteraciones
+# como máximo. Repetir para η = 0.1 .
 
+# Como se van a reutilizar variables, guardamos en otras nuevas los descensos obtenidos
+# en el ejercicio 1.3.a. para la comparación posterior que se hará con el método de Newton.
 descenso1_grad = descenso1
 descenso2_grad = descenso2
 
+# Estimamos w con el método de Newton empezando por (-1, 1), con 50 iteraciones de máximo
+# y para una tasa de aprendizaje de 0.01 y 0.1 . Imprimos por pantalla los resultados
+# obtenidos y mostramos una gráfica comparando los caminos seguidos en ambos casos.
 maxIter = 50
 initial_point = np.array([-1.0, 1.0], dtype=np.float64)
 w1, it1, descenso1 = metodo_de_newton(initial_point, 0.01, error2get, maxIter)
@@ -538,8 +570,14 @@ plt.legend(("eta = 0.01", "eta = 0.1"))
 plt.show()
 
 input("\n--- Pulsar tecla para continuar al ejercicio BONUS.b ---\n")
+
+# BONUS.b. - Obtener el valor mínimo y los valores de las variables (x,y) en donde
+# se alcanzan cuando el punto de inicio se fija en: (-0.5, -0.5), (1, 1), (2.1, -2.1),
+# (-3, 3), (-2, 2). Generar una tabla con los valores obtenidos.
 print("Se muestra tabla...")
 
+# Establecemos la tasa de aprendizaje a 0.01, utilizamos el Método de Newton para
+# todos los puntos pedidos y generamos una tabla con los resultados obtenidos.
 eta = 0.01
 a, it, des = metodo_de_newton(np.array([-0.5, -0.5],dtype=np.float64), eta, error2get, maxIter)
 b, it, des = metodo_de_newton(np.array([1.0, 1.0],dtype=np.float64), eta, error2get, maxIter)
@@ -565,6 +603,9 @@ plt.title("Ejercicio BONUS.b. Para eta = " +str(eta)+ " y un máximo de " +str(m
 table.scale(2.5,2.5)
 plt.show()
 
+# Por último, quise comparar gráficamente los descensos obtenidos por el gradiente descendente
+# y el Método de Newton. Para ello, generamos una gráfica comparando los descensos de ambos algoritmos
+# para una tasa de aprendizaje de 0.01 y otra para una tasa de 0.1 .
 input("\n--- Pulsar tecla para continuar a la comparación Grad. descendente / Newton ---\n")
 print("Se muestra gráfica...")
 
