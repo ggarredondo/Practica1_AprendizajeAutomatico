@@ -4,45 +4,66 @@ TRABAJO 1.
 Nombre Estudiante: Guillermo García Arredondo
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
+import numpy as np # Biblioteca numpy que nos permite trabajar con vectores y funciones trigonométricas.
+import matplotlib.pyplot as plt # Pyplot para hacer las gráficas/tablas.
 
+# Establezco la semilla para los números pseudoaleatorios de numpy para que los resultados obtenidos
+# sean reproducibles. Asigno la semilla a una variable 'seed' porque luego la tendremos que introducir
+# de nuevo.
 seed = 1
 np.random.seed(seed)
 
 print("EJERCICIO SOBRE LA BÚSQUEDA ITERATIVA DE ÓPTIMOS\n")
 print("-Ejercicio 1-\n")
 
+# Función E del ejercicio 1.2.
 def E(u,v):
     return (u**3*np.exp(v-2)-2*v**2*np.exp(-u))**2   
 
-# Derivada parcial de E con respecto a u
+# Derivada parcial de E con respecto a u.
 def dEu(u,v):
     return 2*(u**3*np.exp(v-2)-2*v**2*np.exp(-u))*(3*u**2*np.exp(v-2)+2*v**2*np.exp(-u))
     
-# Derivada parcial de E con respecto a v
+# Derivada parcial de E con respecto a v.
 def dEv(u,v):
     return 2*(u**3*np.exp(v-2)-2*v**2*np.exp(-u))*(u**3*np.exp(v-2)-4*v*np.exp(-u))
 
-# Gradiente de E (Ejercicio 1.2.a)
+# Gradiente de E (Ejercicio 1.2.a).
 def gradE(u,v):
     return np.array([dEu(u,v), dEv(u,v)])
 
 # Ejercicio 1.1 - Implementar el algoritmo de gradiente descendente.
+# Como argumentos de entrada tenemos el punto inicial desde donde el gradiente descendente
+# va a comenzar a minimizar, la tasa de aprendizaje η (eta), el valor mínimo buscado,
+# el número de iteraciones máxima, la función a minimizar y el gradiente de la función.
+# La función y el gradiente son también argumentos para poder reutilizar el código
+# en el apartado 1.3.
 def gradient_descent(initial_point, eta, error2get, maxIter, E, gradE):
-    iterations = 0
-    w = initial_point
-    error = E(w[0], w[1])
-    descenso = np.array([iterations, error],dtype=np.float64)
+    iterations = 0 # Inicializamos el número de iteraciones a 0.
+    w = initial_point # Asignamos a w el punto inicial.
+    error = E(w[0], w[1]) # Calculamos el valor de la función dado el punto inicial.
+    descenso = np.array([iterations, error],dtype=np.float64) # Guardamos en un vector el número de iteraciones y
+                                                              # el valor de la función actual para su posterior
+                                                              # visualización.
+                                                              
+    # Mientras el valor actual de la función no sea menor que el valor mínimo buscado y el número de
+    # iteraciones no superen las iteraciones máximas. Se hace valor absoluto a 'error' para el caso
+    # en el que la función dada como E pueda dar valores negativos, con tal de que no termine prematuramente
+    # en un mínimo local.                                                       
     while not abs(error) < error2get and iterations < maxIter:
-        w = w - eta*gradE(w[0], w[1])
-        error = E(w[0], w[1])
-        iterations += 1
-        descenso = np.row_stack((descenso, np.array([iterations, error])))
-    return w, iterations, descenso 
+        w = w - eta*gradE(w[0], w[1]) # Obtenemos el nuevo w dada la ecuación general wj = wj-η*dEin(w)/dwj .
+        error = E(w[0], w[1]) # Calculamos el valor de la función dada la nueva w.
+        iterations += 1 # Contamos una iteración más.
+        descenso = np.row_stack((descenso, np.array([iterations, error]))) # Guardamos en un vector el número de iteraciones y
+                                                                           # el valor de la función actual para su posterior
+                                                                           # visualización.
+    # Se devuelve el w obtenido junto al número de iteraciones final y el descenso seguido por el algoritmo.
+    return w, iterations, descenso
 
 
-# Ejercicio 1.2
+# Ejercicio 1.2.
+# Para este ejercicio establecemos una tasa de aprendizaje de 0.1, 10000000000 iteraciones
+# máximas, un valor mínimo de 10^-14 y un punto inicial (1, 1).
 eta = 0.1 
 maxIter = 10000000000
 error2get = 1e-14
@@ -56,9 +77,12 @@ print ("-1.2-\n\nNúmero de iteraciones: ", it)
 # menor a 10^-14 en el apartado anterior?
 print ("Coordenadas obtenidas: (", w[0], ", ", w[1], ")")
 
-# DISPLAY FIGURE
-from mpl_toolkits.mplot3d import Axes3D
-x = np.linspace(-2, 2, 50)
+# Mostrar en una gráfica el hiperplano y el punto mínimo obtenido
+from mpl_toolkits.mplot3d import Axes3D # Importamos Axes3D para poder visualizar el hiperplano en una
+                                        # gráfica en tres dimensiones.
+                                        
+x = np.linspace(-2, 2, 50) # Obtenemos 50 valores equidistantes en el intervalo [-2, 2] en vez de [-30, 30]
+                           # para que la gráfica sea más clara
 y = np.linspace(-2, 2, 50)
 X, Y = np.meshgrid(x, y)
 Z = E(X, Y) #E_w([X, Y])
@@ -79,6 +103,7 @@ input("\n--- Pulsar tecla para continuar al ejercicio 1.3.a ---\n")
 
 # Ejercicio 1.3 
 
+# Función F del ejercicio 1.3.
 def F(x, y):
     return (x+2)**2 + 2*(y-2)**2 + 2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y) 
 
@@ -94,21 +119,28 @@ def dFy(x, y):
 def gradF(x, y):
     return np.array([dFx(x, y), dFy(x, y)])
 
-# 1.3.a - Minimizar la función para (x0 = -1, y0 = 1), eta = 0.01 y 50 iteraciones
-# como máximo. Repetir para eta = 0.1 .
+# 1.3.a - Minimizar la función para (x0 = -1, y0 = 1), η = 0.01 y 50 iteraciones
+# como máximo. Repetir para η = 0.1 .
+
+# Establecemos el máximo de iteraciones a 50 y calculamos el gradiente descendente empezando por
+# (-1, 1) para una tasa de aprendizaje 0.01 y 0.1
 maxIter = 50
 initial_point = np.array([-1.0, 1.0], dtype=np.float64)
 w1, it1, descenso1 = gradient_descent(initial_point, 0.01, error2get, maxIter, F, gradF)
 w2, it2, descenso2 = gradient_descent(initial_point, 0.1, error2get, maxIter, F, gradF)
 
+# Imprimimos por pantalla los resultados obtenidos para η = 0.01
 print ("Para eta = 0.01\nNúmero de iteraciones: ", it1)
 print ("Coordenadas obtenidas: (", w1[0], ", ", w1[1], ")")
 print ("Ein: ", F(w1[0], w1[1]))
 
+# Y para η = 0.1
 print ("\nPara eta = 0.1\nNúmero de iteraciones: ", it2)
 print ("Coordenadas obtenidas: (", w2[0], ", ", w2[1], ")")
 print ("Ein: ", F(w2[0], w2[1]))
 
+# Y mostramos ambos descensos en una gráfica, dados las iteraciones y los valores 
+# obtenidos durante la ejecución del algoritmo.
 plt.plot(descenso1[:,0], descenso1[:,1])
 plt.plot(descenso2[:,0], descenso2[:,1], "r")
 plt.title("Ejercicio 1.3.a. Gradiente descendente de F(x,y)")
@@ -120,18 +152,25 @@ plt.show()
 input("\n--- Pulsar tecla para continuar al ejercicio 1.3.b ---\n")
 print("Se muestra tabla...")
 
+# Cambiamos la tasa de aprendizaje a 0.01 y calculamos el descenso para todos los puntos pedidos.
 eta = 0.01
 a, it, des = gradient_descent(np.array([-0.5, -0.5],dtype=np.float64), eta, error2get, maxIter, F, gradF)
 b, it, des = gradient_descent(np.array([1.0, 1.0],dtype=np.float64), eta, error2get, maxIter, F, gradF)
 c, it, des = gradient_descent(np.array([2.1, -2.1],dtype=np.float64), eta, error2get, maxIter, F, gradF)
 d, it, des = gradient_descent(np.array([-3.0, 3.0],dtype=np.float64), eta, error2get, maxIter, F, gradF)
 e, it, des = gradient_descent(np.array([-2.0, 2.0],dtype=np.float64), eta, error2get, maxIter, F, gradF)
+
+# Concatenamos los puntos obtenidos con sus respectivos valores de F en un mismo vector para las columnas
+# de la tabla.
 valores = np.array([np.append(a, F(a[0], a[1])), np.append(b, F(b[0], b[1])),
                     np.append(c, F(c[0], c[1])), np.append(d, F(d[0], d[1])),
                     np.append(e, F(e[0], e[1]))])
-
+# Con plt.subplots() obtenemos ax que son los ejes de la figura que necesitamos para crear la tabla.
 fig, ax = plt.subplots()
-ax.axis("off")
+ax.axis("off") # Pyplot por defecto genera los ejes de un gráfico 2D al crear una figura. Es por ello que tenemos que
+               # desactivarlos si no queremos que estén de fondo por debajo de la tabla.
+# Finalmente, creamos y mostramos la tabla utilizando el vector de columnas que habíamos inicializado antes 
+# y añadiendo las etiquetas pertinentes.
 table = ax.table(cellText=valores, 
           colLabels=["x","y","F(x,y)"],
           rowLabels=["(-0.5,-0.5)",
@@ -140,9 +179,8 @@ table = ax.table(cellText=valores,
                      "(-3,3)",
                      "(-2,2)"],
           loc="center")
-
 plt.title("Ejercicio 1.3.b. Para eta = " +str(eta)+ " y un máximo de " +str(maxIter)+ " iteraciones")
-table.scale(2.5,2.5)
+table.scale(2.5,2.5) # Escalamos la tabla porque por defecto es demasiado pequeña y no es legible.
 plt.show()
 
 input("\n--- Pulsar tecla para continuar al ejercicio 2 ---\n")
@@ -153,7 +191,9 @@ input("\n--- Pulsar tecla para continuar al ejercicio 2 ---\n")
 ###############################################################################
 print("EJERCICIO SOBRE REGRESIÓN LINEAL\n")
 print("-Ejercicio 2-\n")
-from sklearn.utils import shuffle
+from sklearn.utils import shuffle # Para este ejercicio he importado de sklearn la función shuffle
+# para poder barajar dos vectores en el mismo orden, pues es necesario para el algoritmo de
+# gradiente descendente estocásitco.
 
 label5 = 1
 label1 = -1
@@ -179,35 +219,50 @@ def readData(file_x, file_y):
 	
 	return x, y
 
-# Función para calcular el error
+# Función para calcular el error. E(hw) = 1/N*Σ(hw(xn) - yn)^2
+# Se utiliza matmul para la correcta multiplicación de matrices de 'x' y 'w', lo cual
+# nos da una fila de los valores estimados a la cual restamos 'y'. Hacemos el cuadrado
+# de la diferencia y hacemos la media.
 def Err(x,y,w):
     return ((np.matmul(x,w) - y)**2).mean(axis=0)
 
-# Gradiente de la función de error
+# Gradiente de la función de error. dE(hw)/dwj = 2/N*Σ(xnj*(hw(xn) - yn))
+# Se hace la traspuesta de X para poder multiplicar con el resultado de X*w-y.
 def gradErr(x, y, w):
     return (2/len(x)*np.matmul(x.T, (np.matmul(x,w) - y)))
     
-# Gradiente Descendente Estocástico
+# Gradiente Descendente Estocástico (SGD).
+# Como argumentos de entrada tenemos el punto de inicio para empezar a minimizar,
+# los datos x e y, la tasa de aprendizaje η (eta), el error mínimo buscado,
+# el número máximo de iteraciones y el tamaño que tendrán los minibatches.
 def sgd(initial_point, x, y, eta, error2get, maxIter, minibatch_size):
-    w = initial_point  
-    iterations = 0
+    w = initial_point # Asignamos el punto inicial a w.
+    iterations = 0 # Inicializamos el número de iteraciones a 0.
     
-    parar = False
-    while not parar and iterations < maxIter:
-        x,y = shuffle(x, y, random_state=seed)
+    parar = False # Inicializamos una condición de parada que será la que compruebe
+                  # más adelante si se ha alcanzado el mínimo.
+    while not parar and iterations < maxIter: # Mientras no 'parar' y el número de iteraciones no alcance el máximo...
+        x,y = shuffle(x, y, random_state=seed) # Barajamos los datos x e y utilizando la función shuffle
+                                               # para asegurarnos que no se pierda la correspondencia. Además,
+                                               # asignamos la semilla que previamente habíamos establecido. Esto no
+                                               # causará que en cada llamada se baraje de la misma manera, solo que
+                                               # los resultados sean reproducibles.
+        # Divido x e y en n minibatches, siendo n el tamaño de x/y dividido entre el tamaño del minibatch                
         minibatches_x = np.array_split(x, len(x)//minibatch_size)
         minibatches_y = np.array_split(y, len(y)//minibatch_size)
         
-        for i in range(0, len(minibatches_x)):
-            w = w - eta*gradErr(minibatches_x[i], minibatches_y[i], w)
-            error = Err(minibatches_x[i], minibatches_y[i], w)
-            parar = abs(error) < error2get
-            if parar:
+        for i in range(0, len(minibatches_x)): # Para cada minibatch...
+            w = w - eta*gradErr(minibatches_x[i], minibatches_y[i], w) # Obtenemos el nuevo w dado wj = wj-η*dEin(w)/dwj .
+            error = Err(minibatches_x[i], minibatches_y[i], w) # Obtenemos el error dado el nuevo w
+            parar = abs(error) < error2get # Comprobamos si el error es menor que el error mínimo buscado.
+            if parar: # Si lo es, terminamos el bucle.
                 break
-        iterations += 1
-    return w
+        iterations += 1 # Tras iterar para cada minibatch, contamos una iteración y empieza de nuevo el bucle while.
+    return w # Devolvemos el w final.
 
-# Pseudoinversa	
+# Algoritmo de la Pseudoinversa. w = X†*y
+# Para ello simplemente utilizamos matmul para multiplicar la pseudoinversa dada por
+# la función pinv de numpy con y.
 def pseudoinverse(x, y):
     w = np.matmul(np.linalg.pinv(x), y)
     return w
