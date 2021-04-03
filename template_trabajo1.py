@@ -64,6 +64,7 @@ def gradient_descent(initial_point, eta, error2get, maxIter, E, gradE):
 # Ejercicio 1.2.
 # Para este ejercicio establecemos una tasa de aprendizaje de 0.1, 10000000000 iteraciones
 # máximas, un valor mínimo de 10^-14 y un punto inicial (1, 1).
+# La variable 'error2get' se seguirá usando durante el resto de la práctica sin cambiar su valor.
 eta = 0.1 
 maxIter = 10000000000
 error2get = 1e-14
@@ -246,7 +247,8 @@ def sgd(initial_point, x, y, eta, error2get, maxIter, minibatch_size):
                                                # para asegurarnos que no se pierda la correspondencia. Además,
                                                # asignamos la semilla que previamente habíamos establecido. Esto no
                                                # causará que en cada llamada se baraje de la misma manera, solo que
-                                               # los resultados sean reproducibles.
+                                               # los resultados sean reproducibles. Es decir, la aleatoridad se 
+                                               # repite por ejecución pero no por llamada.
         # Divido x e y en n minibatches, siendo n el tamaño de x/y dividido entre el tamaño del minibatch                
         minibatches_x = np.array_split(x, len(x)//minibatch_size)
         minibatches_y = np.array_split(y, len(y)//minibatch_size)
@@ -260,7 +262,7 @@ def sgd(initial_point, x, y, eta, error2get, maxIter, minibatch_size):
         iterations += 1 # Tras iterar para cada minibatch, contamos una iteración y empieza de nuevo el bucle while.
     return w # Devolvemos el w final.
 
-# Algoritmo de la Pseudoinversa. w = X†*y
+# Pseudoinversa. w = X†*y
 # Para ello simplemente utilizamos matmul para multiplicar la pseudoinversa dada por
 # la función pinv de numpy con y.
 def pseudoinverse(x, y):
@@ -276,21 +278,33 @@ x, y = readData('datos/X_train.npy', 'datos/y_train.npy')
 # Lectura de los datos para el test
 x_test, y_test = readData('datos/X_test.npy', 'datos/y_test.npy')
 
+# Utlizamos el gradiente descendente estócastico para los datos de entrenamiento con la
+# misma tasa de aprendizaje anterior (0.01), error mínimo 10^-14, 100 iteraciones máximas
+# y 24 elementos por minibatch. Escribimos el resultado en pantalla.
 maxIter = 100
 w_sgd = sgd(np.array([0.0] * x.shape[1], dtype=np.float64), x, y, eta, error2get, maxIter, 24)
 print ("Bondad del resultado para grad. descendente estocástico:")
 print ("Ein: ", Err(x,y,w_sgd))
 
+# Utilizamos la pseudoinversa para los mismos datos de entrenamiento y
+# escribimos el resultado en pantalla.
 w_pinv = pseudoinverse(x, y)
 print ("\nBondad del resultado para la pseudoinversa:")
 print ("Ein: ", Err(x,y,w_pinv))
 
-sgd_x = np.linspace(0, 1, 2)
-sgd_y = (-w_sgd[0]-w_sgd[1]*sgd_x)/w_sgd[2]
+# Una vez obtenidos los w para SGD y la pseudoinversa, vamos a mostrar las respectivas rectas
+# en una gráfica.
+sgd_x = np.linspace(0, 1, 2) # Para ello obtendremos dos puntos equidistantes en el intervalo [0,1],
+                             # para la 'x' en la gráfica.
+sgd_y = (-w_sgd[0]-w_sgd[1]*sgd_x)/w_sgd[2] # Y despejaremos x2 del vector de características w0 + w1*x1 + w2*x2,
+                                            # para la 'y' en la gráfica.
 
+# Hacemos lo mismo para el w obtenido con la pseudoinversa.
 pinv_x = np.linspace(0, 1, 2)
 pinv_y = (-w_pinv[0]-w_pinv[1]*pinv_x)/w_pinv[2]
 
+# Y mostramos en una gráfica los puntos con sus respectivas etiquetas y las rectas
+# dadas por el SGD y la pseudoinversa.
 plt.plot(sgd_x, sgd_y, c="blue")
 plt.plot(pinv_x, pinv_y, c="red")
 plt.scatter(x[np.where(y == label5), 1], x[np.where(y == label5), 2], c="yellow")
@@ -301,6 +315,8 @@ plt.xlabel("Intensidad promedio")
 plt.ylabel("Simetría")
 plt.show()
 
+# Ahora escribimos por pantalla los resultados obtenidos para los datos de prueba y
+# dibujamos una nueva gráfica.
 input("\n--- Pulsar tecla para mostrar la gráfica con la muestra de prueba ---\n")
 print ("Bondad del resultado para grad. descendente estocástico:")
 print ("Eout: ", Err(x_test, y_test, w_sgd))
@@ -325,7 +341,9 @@ input("\n--- Pulsar tecla para continuar al ejercicio 2.2.a ---\n")
 
 def simula_unif(N, d, size):
  	return np.random.uniform(-size,size,(N,d))
- 
+
+# Obtenemos una muestra de entrenamiento utilizando simula_inf, la imprimimos por pantalla
+# y mostramos una gráfica.
 x_train = simula_unif(1000, 2, 1)
 print("La muestra de entrenamiento: ")
 print(x_train)
@@ -347,11 +365,17 @@ def sign(x):
 def f(x1, x2):
  	return sign((x1-0.2)**2 + x2**2 - 0.6)
 
+# Función para introducir ruido aleatoriamente en un vector de etiquetas 'y',
+# dada una semilla 'seed'.
 def generar_ruido(y, seed):
-    rng = np.random.default_rng(seed)
+    rng = np.random.default_rng(seed) # Asignamos a una variable 'rng' un generador de números pseudoaleatorios.
+    # Accedemos a posiciones aleatorias y no repetidas (por ello replace=False) durante y.size//10 (10% del tamaño
+    # de 'y', truncado) iteraciones y multiplicamos por -1.
     for i in range(0, y.size//10):
         y[rng.choice(y.size, replace=False)] *= -1
 
+# Aquí obtenemos el vector de etiquetas 'y_train' para los datos de entrenamiento 'x_train' y 
+# mostramos por pantalla una gráfica con los puntos coloreados según su etiqueta.
 y_train = np.array([f(x1, x2) for x1, x2 in x_train], dtype=np.float64)
 plt.scatter(x_train[np.where(y_train == 1), 0], x_train[np.where(y_train == 1), 1], c="yellow")
 plt.scatter(x_train[np.where(y_train == -1), 0], x_train[np.where(y_train == -1), 1], c="purple")
@@ -362,6 +386,7 @@ plt.show()
 input("\n--- Pulsar tecla para continuar con el ejercicio 2.2.b ---\n")
 print("Se muestra gráfica...")
 
+# Introducimos ruido y hacemos otra gráfica con los mismos puntos.
 generar_ruido(y_train, seed)
 plt.scatter(x_train[np.where(y_train == 1), 0], x_train[np.where(y_train == 1), 1], c="yellow")
 plt.scatter(x_train[np.where(y_train == -1), 0], x_train[np.where(y_train == -1), 1], c="purple")
@@ -373,13 +398,17 @@ input("\n--- Pulsar tecla para continuar al ejercicio 2.2.c ---\n")
 
 # 2.2.c - Ajustar un modelo de regresión lineal al conjunto de datos generado y estimar w con SGD.
 
+# Insertamos una columna de unos a la muestra de entrenamiento 'x_train' y estimamos w con SGD. Imprimimos
+# por pantalla el error obtenido.
 X_train = np.hstack((np.ones((x_train.shape[0], 1)), x_train))
 w_sgd = sgd(np.array([0.0] * X_train.shape[1], dtype=np.float64), X_train, y_train, eta, error2get, maxIter, 24)
 print("Ein: ", Err(X_train, y_train, w_sgd))
 
+# Calculamos los puntos necesarios para obtener la recta de w.
 sgd_x = np.linspace(-1, 1, 2)
 sgd_y = (-w_sgd[0]-w_sgd[1]*sgd_x)/w_sgd[2]
 
+# Generamos una gráfica con la recta dada por w y los puntos coloreados según su etiqueta.
 plt.plot(sgd_x, sgd_y, c="red")
 plt.ylim(-1.,1.)
 plt.scatter(X_train[np.where(y_train == 1), 1], X_train[np.where(y_train == 1), 2], c="yellow")
@@ -393,25 +422,41 @@ input("\n--- Pulsar tecla para continuar al ejercicio 2.2.d ---\n")
 # 2.2.d - Ejecutar el experimento definido de a) a c) 1000 veces, calculando el Ein medio
 # para las 1000 muestras y el Eout medio para otras 1000 muestras diferentes.
 
+# Función que añade una columna de unos a una muestra 'x'.
 def generar_vectorC_lineal(x):
     return np.hstack((np.ones((x.shape[0], 1)), x))
 
+# Para automatizar el hacer 1000 experimentos, he hecho una función que dado un número
+# de iteraciones estima w para una muestra de entrenamiento concreta y para una muestra
+# de prueba generada cada iteración usando SGD y calcula el Ein y Eout medio.
+# Como argumentos de entrada tiene la muestra 'x_train', el vector de etiquetas 'y' sin ruido,
+# el número de iteraciones/experimentos, el máximo de iteraciones para el SGD y un generador
+# de vector de características para reutilizar el código en el ejercicio posterior no lineal.
 def EinEout_medio(x_train, y_train, iteraciones, maxIter_sgd, generar_vectorC):
-    Ein = 0.
-    Eout = 0.
-    x_train = generar_vectorC(x_train)
+    Ein = 0. # Inicializamos el Ein medio a 0.0
+    Eout = 0. # Inicializamos el Eout medio a 0.0
+    x_train = generar_vectorC(x_train) # Generamos el vector de características para 'x_train'
     
-    for i in range(0, iteraciones):
-        x = simula_unif(1000, 2, 1)
-        y = np.array([f(x1, x2) for x1, x2 in x], dtype=np.float64)
-        x = generar_vectorC(x)
-        generar_ruido(y, seed+i)
+    for i in range(0, iteraciones): # Por cada iteración...
+        x = simula_unif(1000, 2, 1) # Se genera una muestra de prueba 'x' con 1000 elementos
+        y = np.array([f(x1, x2) for x1, x2 in x], dtype=np.float64) # Se genera el vector de etiquetas 'y' dado 'x'
+        x = generar_vectorC(x) # Generamos el vector de características para 'x'
+        generar_ruido(y, seed+i) # Introducimos ruido en 'y'. En este caso sí que tenemos que cambiar la semilla
+                                 # cada iteración porque default_rng da el mismo valor en cada llamada dada una misma
+                                 # semilla, a diferencia de las otras funciones de números aleatorios donde la semilla
+                                 # afectaba a un nivel de ejecución.
         
+        # Estimamos w para la muestra de entrenamiento.
         w = sgd(np.array([0.0] * x_train.shape[1], dtype=np.float64), x_train, y_train, 0.01, 1e-14, maxIter_sgd, 24)
+        # Sumamos a Ein el error para la muestra de entrenamiento dado w.
         Ein += Err(x_train, y_train, w)
+        # Sumamos a Eout el error para la muestra de prueba dado el w obtenido con la muestra de entrenamiento.
         Eout += Err(x, y, w)
+    # Se devuelve Ein y Eout divido por el número de iteraciones para obtener la media.
     return Ein/iteraciones, Eout/iteraciones
 
+# Calculamos el Ein y Eout medio de 1000 iteraciones dada la muestra de entrenamiento generada
+# previamente y para un vector de características lineal. Imprimimos por pantalla el resultado.
 Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 10, generar_vectorC_lineal)
 print("Ein medio: ", Ein_medio)
 print("Eout medio: ", Eout_medio)
@@ -422,10 +467,13 @@ input("\n--- Pulsar tecla para continuar con el experimento con características
 # Se utiliza el siguiente vector de características: phi²(x) = (1,x1,x2,x1*x1,x1²,x2²).
 # Ajustar el nuevo modelo de regresión lineal y calcular w. Calcular los errores promedio Ein y Eout.
 
+# Función que transforma una muestra 'x' (x1, x2) al vector de características (1,x1,x2,x1*x1,x1²,x2²).
 def generar_vectorC_noLineal(x):
-    x = np.hstack((np.ones((x.shape[0], 1)), x))
-    return np.hstack((x, np.array([(x[:,1]*x[:,2]), (x[:,1]**2), (x[:,2]**2)]).T))
+    x = np.hstack((np.ones((x.shape[0], 1)), x)) # Se añade una columna de unos al principio de 'x'.
+    return np.hstack((x, np.array([(x[:,1]*x[:,2]), (x[:,1]**2), (x[:,2]**2)]).T)) # Se añade el resto de columnas.
 
+# Hacemos el mismo experimento anterior pero para el vector de características no lineal e imprimimos
+# por pantalla el resultado.
 Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 25, generar_vectorC_noLineal)
 print("Ein medio: ", Ein_medio)
 print("Eout medio: ", Eout_medio)
@@ -435,7 +483,6 @@ print("-BONUS.a-\n")
 
 # BONUS: Método de Newton
 # Implementar el algoritmo de minimización de Newton para el F(x,y) dado en el ejercicio 1.3.
-
 def d2Fx(x, y):
     return -8*np.pi**2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y) + 2
 
@@ -445,8 +492,10 @@ def d2Fy(x, y):
 def d2Fxy(x, y):
     return 8*np.pi**2*np.cos(2*np.pi*x)*np.cos(2*np.pi*y)
 
+d2Fyx = d2Fxy
+
 def H(x, y):
-    return np.array([[d2Fx(x,y), d2Fxy(x,y)], [d2Fxy(x,y), d2Fy(x,y)]], dtype=np.float64)
+    return np.array([[d2Fx(x,y), d2Fxy(x,y)], [d2Fyx(x,y), d2Fy(x,y)]], dtype=np.float64)
 
 def metodo_de_newton(initial_point, eta, error2get, maxIter):
     iterations = 0
