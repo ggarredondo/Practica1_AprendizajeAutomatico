@@ -526,7 +526,7 @@ def metodo_de_newton(initial_point, eta, error2get, maxIter):
     # Mientras el error no sea menor que el error mínimo buscado y el número de
     # iteraciones no superen las iteraciones máximas...
     while not abs(error) < error2get and iterations < maxIter:
-        w = w - eta*np.matmul(H(w[0], w[1])**-1, gradF(w[0], w[1])) # Se calcula w dada la ecuación
+        w = w - eta*np.matmul(np.linalg.inv(H(w[0], w[1])), gradF(w[0], w[1])) # Se calcula w dada la ecuación
                                                                     # xn+1 = xn - η * Hf(xn)^-1 * ▽f(xn) .
         error = F(w[0], w[1]) # Se calcula el error dado el nuevo w.
         iterations += 1 # Se cuenta una iteración más.
