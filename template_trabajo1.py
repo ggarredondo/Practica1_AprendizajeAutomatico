@@ -478,7 +478,7 @@ def generar_vectorC_noLineal(x):
 
 # Hacemos el mismo experimento anterior pero para el vector de características no lineal e imprimimos
 # por pantalla el resultado.
-Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 25, 24, generar_vectorC_noLineal)
+Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 10, 24, generar_vectorC_noLineal)
 print("Ein medio: ", Ein_medio)
 print("Eout medio: ", Eout_medio)
 
