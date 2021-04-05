@@ -434,9 +434,9 @@ def generar_vectorC_lineal(x):
 # de iteraciones estima w para una muestra de entrenamiento concreta y para una muestra
 # de prueba generada cada iteración usando SGD y calcula el Ein y Eout medio.
 # Como argumentos de entrada tiene la muestra 'x_train', el vector de etiquetas 'y' sin ruido,
-# el número de iteraciones/experimentos, el máximo de iteraciones para el SGD y un generador
-# de vector de características para reutilizar el código en el ejercicio posterior no lineal.
-def EinEout_medio(x_train, y_train, iteraciones, maxIter_sgd, generar_vectorC):
+# el número de iteraciones/experimentos, el máximo de iteraciones para el SGD, el tamaño de cada
+# minibatch y un generador de vector de características para reutilizar el código en el ejercicio posterior no lineal.
+def EinEout_medio(x_train, y_train, iteraciones, maxIter_sgd, minibatch_size, generar_vectorC):
     Ein = 0. # Inicializamos el Ein medio a 0.0
     Eout = 0. # Inicializamos el Eout medio a 0.0
     x_train = generar_vectorC(x_train) # Generamos el vector de características para 'x_train'
@@ -451,7 +451,7 @@ def EinEout_medio(x_train, y_train, iteraciones, maxIter_sgd, generar_vectorC):
                                  # afectaba a un nivel de ejecución.
         
         # Estimamos w para la muestra de entrenamiento.
-        w = sgd(np.array([0.0] * x_train.shape[1], dtype=np.float64), x_train, y_train, 0.01, 1e-14, maxIter_sgd, 24)
+        w = sgd(np.array([0.0] * x_train.shape[1], dtype=np.float64), x_train, y_train, 0.01, 1e-14, maxIter_sgd, minibatch_size)
         # Sumamos a Ein el error para la muestra de entrenamiento dado w.
         Ein += Err(x_train, y_train, w)
         # Sumamos a Eout el error para la muestra de prueba dado el w obtenido con la muestra de entrenamiento.
@@ -461,7 +461,7 @@ def EinEout_medio(x_train, y_train, iteraciones, maxIter_sgd, generar_vectorC):
 
 # Calculamos el Ein y Eout medio de 1000 iteraciones dada la muestra de entrenamiento generada
 # previamente y para un vector de características lineal. Imprimimos por pantalla el resultado.
-Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 10, generar_vectorC_lineal)
+Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 10, 24, generar_vectorC_lineal)
 print("Ein medio: ", Ein_medio)
 print("Eout medio: ", Eout_medio)
 
@@ -478,7 +478,7 @@ def generar_vectorC_noLineal(x):
 
 # Hacemos el mismo experimento anterior pero para el vector de características no lineal e imprimimos
 # por pantalla el resultado.
-Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 25, generar_vectorC_noLineal)
+Ein_medio, Eout_medio = EinEout_medio(x_train, y_train, 1000, 25, 24, generar_vectorC_noLineal)
 print("Ein medio: ", Ein_medio)
 print("Eout medio: ", Eout_medio)
 
